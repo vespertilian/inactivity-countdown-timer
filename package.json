@@ -1,0 +1,21 @@
+{
+  "name": "@benefex/inactivity-logout",
+  "version": "0.1.0",
+  "description": "A vanilla JS library to automatically logout users after a specified time",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine": "2.4.1",
+    "karma": "0.13.22",
+    "karma-webpack": "1.7.0",
+    "ts-loader": "0.8.2",
+    "typescript": "1.8.10",
+    "typings": "1.1.0",
+    "webpack": "1.13.1"
+  }
+}
