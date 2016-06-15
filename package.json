@@ -4,7 +4,8 @@
   "description": "A vanilla JS library to automatically logout users after a specified time",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "karma start",
+    "start": "webpack-dev-server --content-base dist/ --host 0.0.0.0"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
@@ -16,6 +17,7 @@
     "ts-loader": "0.8.2",
     "typescript": "1.8.10",
     "typings": "1.1.0",
-    "webpack": "1.13.1"
+    "webpack": "1.13.1",
+    "webpack-dev-server": "1.14.1"
   }
 }
