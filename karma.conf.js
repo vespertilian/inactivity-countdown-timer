@@ -13,19 +13,20 @@ module.exports = function(config) {
         singleRun: false,
         autoWatchBatchDelay: 300,
 
-        files: [
-            './dist/inactivity-logout.js',
-            './tests/**/*.ts'],
+        files: ['./tests/**/*.ts'],
 
         preprocessors: {
-            './index.ts': ['webpack'],
             './tests/**/*.spec.ts': ['webpack']
         },
 
-        webpack: webpackConfig,
+        webpack: {
+            module: webpackConfig.module,
+            resolve: webpackConfig.resolve
+        },
 
         webpackMiddleware: {
             noInfo: true
         }
+
     });
 }
