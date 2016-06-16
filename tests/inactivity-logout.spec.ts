@@ -1,8 +1,6 @@
 import {InactivityLogout} from '../src/index.ts'
 describe('Inactivity logout -', () => {
 
-    afterEach(() => { jasmine.clock().uninstall()});
-
     it('should allow you to set the idleTimeout and localStorageKey', () => {
         let params = {idleTimeoutTime: 5000, startCountDownTimerAt: 2000, localStorageKey: 'some_special_key'};
         let IL = new InactivityLogout(params);
@@ -34,16 +32,36 @@ describe('Inactivity logout -', () => {
         expect(windowAttachEventSpy).toHaveBeenCalledWith('load', jasmine.any(Function), false);
     });
 
-    fit('should timeout when the idleTimeout is finished', () => {
+    it('should timeout when the idleTimeout is finished', () => {
         jasmine.clock().install();
 
         let callback = jasmine.createSpy('timerCallback');
         let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: callback});
         expect(callback).not.toHaveBeenCalled();
-        jasmine.clock().tick(100000);
+        jasmine.clock().tick(2001);
         expect(callback).toHaveBeenCalled();
 
         jasmine.clock().uninstall();
+    });
+
+    fit('should reset the idleTimeout if one of the event handlers get\s called', () => {
+        //['click', 'mousemove', 'keypress'].forEach((mouseEvent) => {
+            jasmine.clock().install();
+            let tcallback = jasmine.createSpy('timerCallback');
+            let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: tcallback});
+            console.log('new InactivityLogout created');
+            jasmine.clock().tick(1001); // 1001 total time
+            console.log('jasmine.clock().tick(1001)');
+            expect(tcallback).not.toHaveBeenCalled();
+            dispatchMouseEvent('click'); // timer will reset and initialise at 2000
+            jasmine.clock().tick(1000); // 2001 total time
+            console.log('jasmine.clock().tick(2001)');
+            expect(tcallback).not.toHaveBeenCalled(); // fails see reason below
+            jasmine.clock().tick(2000); // 4001
+            console.log('jasmine.clock().tick(4001)');
+            expect(tcallback).toHaveBeenCalled();
+            jasmine.clock().uninstall();
+        //});
     });
 
     // count down timer should be a smaller number than idleTimeout
@@ -51,4 +69,24 @@ describe('Inactivity logout -', () => {
 
 });
 
+
+// see this link for eventClasses https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent#Notes
+function dispatchMouseEvent(eventName){
+    // http://stackoverflow.com/questions/2490825/how-to-trigger-event-in-javascript
+    let eventClass = 'MouseEvents';
+    let docEvent = document.createEvent(eventClass);
+    docEvent.initEvent(eventName, true, true);
+    dispatchEvent(document, docEvent);
+}
+
+// IE8 fix
+function dispatchEvent(element, event: Event){
+    if(element['dispatchEvent']){
+        element.dispatchEvent(event)
+    } else if(element['fireEvent']){
+        element.fireEvent('on' + event.type); // ie8 fix
+    } else {
+        throw new Error('No dispatch event method in browser')
+    }
+}
 
