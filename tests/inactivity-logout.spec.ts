@@ -1,19 +1,19 @@
 import {InactivityLogout} from '../src/index.ts'
-describe('Inactivity logout', () => {
+describe('Inactivity logout -', () => {
 
     afterEach(() => { jasmine.clock().uninstall()});
 
     it('should allow you to set the idleTimeout and localStorageKey', () => {
-        let params = {idleTimeout: 5000, startCountDownTimer: 2000, localStorageKey: 'some_special_key'};
+        let params = {idleTimeoutTime: 5000, startCountDownTimerAt: 2000, localStorageKey: 'some_special_key'};
         let IL = new InactivityLogout(params);
-        expect(IL.idleTimeout).toEqual(5000);
+        expect(IL.idleTimeoutTime).toEqual(5000);
         expect(IL.localStorageKey).toEqual('some_special_key');
     });
 
     it('should use defaults if you do not pass in params', () => {
         let IL = new InactivityLogout();
-        expect(IL.idleTimeout).toEqual(10000);
-        expect(IL.startCountDownTimeout).toEqual(3000);
+        expect(IL.idleTimeoutTime).toEqual(10000);
+        expect(IL.startCountDownTimerAt).toEqual(3000);
         expect(IL.localStorageKey).toEqual('inactivity_logout_local_storage');
     });
 
@@ -34,14 +34,16 @@ describe('Inactivity logout', () => {
         expect(windowAttachEventSpy).toHaveBeenCalledWith('load', jasmine.any(Function), false);
     });
 
-    it('should timeout when the idleTimeout is finished', () => {
-        // setup timer
+    fit('should timeout when the idleTimeout is finished', () => {
         jasmine.clock().install();
-        let timeoutCallback = jasmine.createSpy('callback');
-        let IL = new InactivityLogout({idleTimeout: 2000},timeoutCallback);
-        expect(timeoutCallback).not.toHaveBeenCalled();
-        jasmine.clock().tick(2001);
-        expect(timeoutCallback).toHaveBeenCalled();
+
+        let callback = jasmine.createSpy('timerCallback');
+        let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: callback});
+        expect(callback).not.toHaveBeenCalled();
+        jasmine.clock().tick(100000);
+        expect(callback).toHaveBeenCalled();
+
+        jasmine.clock().uninstall();
     });
 
     // count down timer should be a smaller number than idleTimeout

@@ -1,45 +1,55 @@
 class InactivityLogout {
-    public idleTimeout: number;
-    public startCountDownTimeout: number;
+
+    public idleTimeoutTime: number;
+    public startCountDownTimerAt: number;
     public localStorageKey: string;
     public idleSecondsTimer: number = null;
     public lastResetTimeStamp: number = (new Date()).getTime();
     public localStorage: WindowLocalStorage | boolean;
 
+    private timeoutCallback: Function;
     private idleTimeoutID: string;
     private startCountdownTimeoutID: string;
 
-    constructor(params: IConfigParams = {}, private timeoutCallback?){
+    constructor(params: IConfigParams = {}){
         // config var defaults
-
         // how long you can be idle for before we time you out
-        this.idleTimeout = params.idleTimeout || 10000;
+        this.idleTimeoutTime = params.idleTimeoutTime || 10000;
         // when we start a countdown timer
-        this.startCountDownTimeout = params.startCountdownTimeout || 3000;
+        this.startCountDownTimerAt = params.startCountdownTimerAt || 3000;
+        // custom local storage key
         this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
+        // timeout callback
+        this.timeoutCallback = params.timeoutCallback;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
-
         // attach events that will rest the timers
         this.attachEvent(document, 'click', this.resetTimers);
         this.attachEvent(document, 'mousemove', this.resetTimers);
         this.attachEvent(document, 'keypress', this.resetTimers);
         this.attachEvent(window, 'load', this.resetTimers);
+
+        this.startTimers();
     }
 
-
-    resetTimers(): void {
-        this.setLastResetTimeStamp(new Date().getTime())
+    startTimers(): void {
+        debugger
+        window.setTimeout(()=> { this.timeout() }, this.idleTimeoutTime);
     }
+
+    restTimers(): void {
+        console.log('resetTimers')
+    }
+
 
     resetTimeouts(): void {
-
     }
 
     timeout(): void {
+        debugger
         this.timeoutCallback();
-        document.location.href = "logout.html";
+        //document.location.href = "logout.html";
     }
 
     getLastResetTimeStamp(): number {
@@ -91,9 +101,10 @@ class InactivityLogout {
 export {InactivityLogout}
 
 interface IConfigParams {
-    idleTimeout?: number;
-    startCountdownTimeout?: number;
+    idleTimeoutTime?: number;
+    startCountdownTimerAt?: number;
     localStorageKey?: string;
+    timeoutCallback?: Function;
 }
 
 interface Window {
