@@ -1,4 +1,4 @@
-import {InactivityLogout} from '../src/index.ts'
+import {InactivityLogout} from '../src/inactivity-logout'
 describe('Inactivity logout -', () => {
 
     it('should allow you to set the idleTimeout and localStorageKey', () => {
@@ -26,42 +26,36 @@ describe('Inactivity logout -', () => {
         let documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
         let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
         let IL = new InactivityLogout();
-        ['click', 'mousemove', 'keypress'].forEach((item) => {
-            expect(documentAttachEventSpy).toHaveBeenCalledWith(item, jasmine.any(Function), false);
+        ['click', 'mousemove', 'keypress'].forEach((event) => {
+            expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL, false);
         });
-        expect(windowAttachEventSpy).toHaveBeenCalledWith('load', jasmine.any(Function), false);
+        expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL, false);
     });
 
     it('should timeout when the idleTimeout is finished', () => {
         jasmine.clock().install();
-
         let callback = jasmine.createSpy('timerCallback');
         let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: callback});
         expect(callback).not.toHaveBeenCalled();
         jasmine.clock().tick(2001);
         expect(callback).toHaveBeenCalled();
-
         jasmine.clock().uninstall();
     });
 
-    fit('should reset the idleTimeout if one of the event handlers get\s called', () => {
-        //['click', 'mousemove', 'keypress'].forEach((mouseEvent) => {
+    it('should reset the idleTimeout if one of the event handlers get\s called', () => {
+        ['click', 'mousemove', 'keypress'].forEach((mouseEvent) => {
             jasmine.clock().install();
-            let tcallback = jasmine.createSpy('timerCallback');
-            let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: tcallback});
-            console.log('new InactivityLogout created');
+            let callback = jasmine.createSpy('timerCallback');
+            let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: callback});
             jasmine.clock().tick(1001); // 1001 total time
-            console.log('jasmine.clock().tick(1001)');
-            expect(tcallback).not.toHaveBeenCalled();
-            dispatchMouseEvent('click'); // timer will reset and initialise at 2000
+            expect(callback).not.toHaveBeenCalled();
+            dispatchMouseEvent(mouseEvent); // timer will reset and initialise at 2000
             jasmine.clock().tick(1000); // 2001 total time
-            console.log('jasmine.clock().tick(2001)');
-            expect(tcallback).not.toHaveBeenCalled(); // fails see reason below
+            expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(2000); // 4001
-            console.log('jasmine.clock().tick(4001)');
-            expect(tcallback).toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledTimes(1);
             jasmine.clock().uninstall();
-        //});
+        });
     });
 
     // count down timer should be a smaller number than idleTimeout
@@ -82,7 +76,7 @@ function dispatchMouseEvent(eventName){
 // IE8 fix
 function dispatchEvent(element, event: Event){
     if(element['dispatchEvent']){
-        element.dispatchEvent(event)
+        element.dispatchEvent(event, true)
     } else if(element['fireEvent']){
         element.fireEvent('on' + event.type); // ie8 fix
     } else {

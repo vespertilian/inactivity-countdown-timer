@@ -4,13 +4,14 @@
   "description": "A vanilla JS library to automatically logout users after a specified time",
   "main": "index.js",
   "scripts": {
-    "test": "karma start",
-    "start": "webpack-dev-server --content-base dist/ --host 0.0.0.0"
+    "test": "cross-env NODE_ENV=test karma start",
+    "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base dist/ --host 0.0.0.0"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {},
   "devDependencies": {
+    "cross-env": "1.0.8",
     "jasmine": "2.4.1",
     "karma": "0.13.22",
     "karma-chrome-launcher": "1.0.1",
