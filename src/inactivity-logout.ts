@@ -3,7 +3,7 @@ interface IConfigParams {
     startCountdownTimerAt?: number;
     localStorageKey?: string;
     timeoutCallback?: Function;
-    window?: Window;
+    signoutHREF?: string;
 }
 
 export class InactivityLogout {
@@ -14,11 +14,12 @@ export class InactivityLogout {
     public idleSecondsTimer: number = null;
     public lastResetTimeStamp: number = (new Date()).getTime();
     public localStorage: WindowLocalStorage | boolean;
+    public signOutHREF: string;
 
     private timeoutCallback: Function;
     private idleTimeoutID: number;
     private startCountdownTimeoutID: string;
-    private window: Window;
+    private window: Window = window;
 
     constructor(params: IConfigParams = {}){
         // config var defaults
@@ -30,8 +31,7 @@ export class InactivityLogout {
         this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
         // timeout callback
         this.timeoutCallback = params.timeoutCallback;
-
-        this.window = params.window || window;
+        this.signOutHREF = params.signoutHREF || false;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
@@ -40,27 +40,29 @@ export class InactivityLogout {
 
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
-        this.attachEvent(document, 'click', this);
-        this.attachEvent(document, 'mousemove', this);
-        this.attachEvent(document, 'keypress', this);
-        this.attachEvent(<IWindow>window, 'load', this);
+        this.addEventListner(document, 'click', this);
+        this.addEventListner(document, 'mousemove', this);
+        this.addEventListner(document, 'keypress', this);
+        this.addEventListner(<IWindow>window, 'load', this);
     }
 
     startTimers(): void {
         this.idleTimeoutID = this.window.setTimeout(()=> { this.timeout() }, this.idleTimeoutTime);
     }
 
-    handleEvent(eventName: string): void {
-        console.log('**** clear timeout for event', eventName);
+    private handleEvent(eventName: string): void {
+        //console.log('**** clear timeout for event', eventName);
         window.clearTimeout(this.idleTimeoutID);
         this.startTimers();
     }
 
-    timeout(): void {
+    public timeout(): void {
         if(this.timeoutCallback){
             this.timeoutCallback();
         }
-        //document.location.href = "logout.html";
+        if(this.signOutHREF){
+            document.location.href = this.signOutHREF;
+        }
     }
 
     //getLastResetTimeStamp(): number {
@@ -84,7 +86,7 @@ export class InactivityLogout {
     //    }
     //}
 
-    private attachEvent(element: IWindow | Document, eventName: string, eventHandler): void {
+    private addEventListner(element: IWindow | Document, eventName: string, eventHandler): void {
         if(element.addEventListener) {
             element.addEventListener(eventName, eventHandler, false)
         }
@@ -108,7 +110,6 @@ export class InactivityLogout {
         }
     }
 }
-
 
 interface IWindow extends Window {
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
