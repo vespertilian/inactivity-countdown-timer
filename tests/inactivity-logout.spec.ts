@@ -2,28 +2,6 @@ import {InactivityLogout} from '../src/inactivity-logout'
 describe('Inactivity logout -', () => {
 
     describe('Setup -', () => {
-        //it('should allow you to override default params with your own', () => {
-        //    let params = {
-        //        idleTimeoutTime: 5000,
-        //        startCountDownTimerAt: 2000,
-        //        localStorageKey: 'some_special_key',
-        //        signoutHREF: 'logout.html'
-        //    };
-        //
-        //    let IL = new InactivityLogout(params);
-        //
-        //    expect(IL.idleTimeoutTime).toEqual(5000);
-        //    expect(IL.startCountDownTimerAt).toEqual(2000);
-        //    expect(IL.localStorageKey).toEqual('some_special_key');
-        //    expect(IL.timeoutC).toEqual('some_special_key');
-        //});
-        //
-        //it('should use defaults if you do not pass in params', () => {
-        //    let IL = new InactivityLogout();
-        //    expect(IL.idleTimeoutTime).toEqual(10000);
-        //    expect(IL.startCountDownTimerAt).toEqual(3000);
-        //    expect(IL.localStorageKey).toEqual('inactivity_logout_local_storage');
-        //});
 
         it('should throw an error if local storage is not present and log to the console', () => {
             spyOn(window.localStorage, 'setItem').and.throwError('Some error');
@@ -34,7 +12,7 @@ describe('Inactivity logout -', () => {
             expect(log).toHaveBeenCalledWith('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS')
         });
 
-        it('should attach event handlers that reset the time to document.click, document.mousemove, document.keypress, window.load', () => {
+        it('should attach event handlers to document.click, document.mousemove, document.keypress, window.load', () => {
             let documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
             let IL = new InactivityLogout();
@@ -83,7 +61,8 @@ describe('Inactivity logout -', () => {
         it('should redirect when the timeout expires if a url was passed in', () => {
             jasmine.clock().install();
             let IL = new InactivityLogout({idleTimeoutTime: 2000, logoutHREF: 'logout.html'});
-            let redirectFunction = spyOn(IL, 'redirect')
+            let redirectFunction = spyOn(IL, 'redirect');
+            expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
             jasmine.clock().tick(2001);
             expect(redirectFunction).toHaveBeenCalledWith('logout.html');
             IL.cleanup();
@@ -104,7 +83,17 @@ describe('Inactivity logout -', () => {
     });
 
     describe('callback - ', () => {
-
+        it('should execute a callback when the timeout expires a callback was passed in', () => {
+            jasmine.clock().install();
+            let callback = jasmine.createSpy('callback');
+            let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: callback});
+            expect(callback).not.toHaveBeenCalled();
+            jasmine.clock().tick(2001);
+            expect(callback).toHaveBeenCalled();
+            IL.cleanup();
+            IL = null;
+            jasmine.clock().uninstall();
+        });
     });
 
     // count down timer should be a smaller number than idleTimeout
