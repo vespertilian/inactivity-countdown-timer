@@ -3,23 +3,22 @@ interface IConfigParams {
     startCountdownTimerAt?: number;
     localStorageKey?: string;
     timeoutCallback?: Function;
-    signoutHREF?: string;
+    logoutHREF?: string;
 }
 
 export class InactivityLogout {
 
-    public idleTimeoutTime: number;
-    public startCountDownTimerAt: number;
-    public localStorageKey: string;
-    public idleSecondsTimer: number = null;
-    public lastResetTimeStamp: number = (new Date()).getTime();
-    public localStorage: WindowLocalStorage | boolean;
-    public signOutHREF: string;
+    private idleTimeoutTime: number;
+    private startCountDownTimerAt: number;
+    private localStorageKey: string;
+    private idleSecondsTimer: number = null;
+    private lastResetTimeStamp: number = (new Date()).getTime();
+    private localStorage: WindowLocalStorage | boolean;
+    private signOutHREF: string;
 
     private timeoutCallback: Function;
     private idleTimeoutID: number;
     private startCountdownTimeoutID: string;
-    private window: Window = window;
 
     constructor(params: IConfigParams = {}){
         // config var defaults
@@ -31,29 +30,43 @@ export class InactivityLogout {
         this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
         // timeout callback
         this.timeoutCallback = params.timeoutCallback;
-        this.signOutHREF = params.signoutHREF || false;
+        this.signOutHREF = params.logoutHREF || false;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
 
-        this.startTimers();
+        this.start();
 
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
+        // see README.md for more on why we are passing this
         this.addEventListner(document, 'click', this);
         this.addEventListner(document, 'mousemove', this);
         this.addEventListner(document, 'keypress', this);
         this.addEventListner(<IWindow>window, 'load', this);
     }
 
-    startTimers(): void {
-        this.idleTimeoutID = this.window.setTimeout(()=> { this.timeout() }, this.idleTimeoutTime);
+    public start(): void {
+        this.idleTimeoutID = window.setTimeout(()=> {
+            this.timeout()
+        }, this.idleTimeoutTime);
+    }
+
+    public stop(): void {
+        window.clearTimeout(this.idleTimeoutID);
+    }
+
+    public cleanup(): void {
+        this.removeEventListner(document, 'click', this);
+        this.removeEventListner(document, 'mousemove', this);
+        this.removeEventListner(document, 'keypress', this);
+        this.removeEventListner(<IWindow>window, 'load', this);
+        this.stop();
     }
 
     private handleEvent(eventName: string): void {
-        //console.log('**** clear timeout for event', eventName);
-        window.clearTimeout(this.idleTimeoutID);
-        this.startTimers();
+        this.stop();
+        this.start();
     }
 
     public timeout(): void {
@@ -61,7 +74,7 @@ export class InactivityLogout {
             this.timeoutCallback();
         }
         if(this.signOutHREF){
-            document.location.href = this.signOutHREF;
+            this.redirect(this.signOutHREF);
         }
     }
 
@@ -96,8 +109,19 @@ export class InactivityLogout {
         // else do nothing.
     }
 
+    private removeEventListner(element: IWindow | Document, eventName: string, eventHandler): void {
+        if(element.removeEventListener) {
+            element.removeEventListener(eventName, eventHandler)
+        }
+        else if (element.attachEvent) {
+            element.attachEvent('on' + eventName, eventHandler)
+        }
+        // else do nothing.
+    }
+
     private detectAndAssignLocalStorage(): WindowLocalStorage | boolean {
         let uid: string = (new Date).getTime().toString();
+        // todo this is broken never assigning to storage
         let storage: WindowLocalStorage;
         let result: string;
         try {
@@ -109,10 +133,19 @@ export class InactivityLogout {
             console.log('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS')
         }
     }
+
+    // cannot mock location changes
+    // so little function allows us to verify redirect is called
+    private redirect(url) {
+        if(url){
+            window.location.href = url;
+        }
+    }
 }
 
 interface IWindow extends Window {
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+    removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
     // This is a proprietary Microsoft Internet Explorer alternative
     // to the standard EventTarget.addEventListener() method.
     // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/attachEvent
@@ -121,6 +154,7 @@ interface IWindow extends Window {
 
 interface Document {
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
+    removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
     // This is a proprietary Microsoft Internet Explorer alternative
     // to the standard EventTarget.addEventListener() method.
     // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/attachEvent

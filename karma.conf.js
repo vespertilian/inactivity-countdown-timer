@@ -4,9 +4,18 @@ module.exports = function(config) {
         basePath: '',
         frameworks: ['jasmine'],
 
-        reporters: ['progress'],
+        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+        reporters: ["spec"],
+        specReporter: {
+            maxLogLines: 5, // limit number of lines logged per test
+            suppressErrorSummary: true, // do not print error summary
+            suppressFailed: false, // do not print information about failed tests
+            suppressPassed: false, // do not print information about passed tests
+            suppressSkipped: true, // do not print information about skipped tests
+            showSpecTiming: false // print the time elapsed for each spec
+        },
         port: 9876,
-        colors: false,
+        colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
         browsers: ['Chrome'],

@@ -29,6 +29,8 @@ describe('Inactivity logout -', () => {
             spyOn(window.localStorage, 'setItem').and.throwError('Some error');
             let log = spyOn(window.console, 'log');
             let IL = new InactivityLogout();
+            IL.cleanup();
+            IL = null;
             expect(log).toHaveBeenCalledWith('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS')
         });
 
@@ -40,6 +42,8 @@ describe('Inactivity logout -', () => {
                 expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL, false);
             });
             expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL, false);
+            IL.cleanup();
+            IL = null;
         });
     });
 
@@ -51,6 +55,8 @@ describe('Inactivity logout -', () => {
             expect(timeout).not.toHaveBeenCalled();
             jasmine.clock().tick(2001);
             expect(timeout).toHaveBeenCalled();
+            IL.cleanup();
+            IL = null;
             jasmine.clock().uninstall();
         });
 
@@ -66,13 +72,40 @@ describe('Inactivity logout -', () => {
                 expect(timeout).not.toHaveBeenCalled();
                 jasmine.clock().tick(2000); // 4001
                 expect(timeout).toHaveBeenCalledTimes(1);
+                IL.cleanup();
+                IL = null;
                 jasmine.clock().uninstall();
             });
         });
-
     });
 
+    describe('redirection - ', () => {
+        it('should redirect when the timeout expires if a url was passed in', () => {
+            jasmine.clock().install();
+            let IL = new InactivityLogout({idleTimeoutTime: 2000, logoutHREF: 'logout.html'});
+            let redirectFunction = spyOn(IL, 'redirect')
+            jasmine.clock().tick(2001);
+            expect(redirectFunction).toHaveBeenCalledWith('logout.html');
+            IL.cleanup();
+            IL = null;
+            jasmine.clock().uninstall();
+        });
 
+        it('should not redirect when the timeout expires if a url was not passed in', () => {
+            jasmine.clock().install();
+            let IL = new InactivityLogout({idleTimeoutTime: 2000});
+            let redirectFunction = spyOn(IL, 'redirect');
+            jasmine.clock().tick(2001);
+            expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
+            IL.cleanup();
+            IL = null;
+            jasmine.clock().uninstall();
+        });
+    });
+
+    describe('callback - ', () => {
+
+    });
 
     // count down timer should be a smaller number than idleTimeout
     // test that if local storage has been change  by another tab the ending timeout does not fire

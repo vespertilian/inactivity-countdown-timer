@@ -6,6 +6,7 @@ if(ON_DEV){
     function demoCallback(){
         console.log('Demo callback')
     }
+    debugger
     new InactivityLogout({timeoutCallback: demoCallback})
 }
 
