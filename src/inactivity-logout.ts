@@ -1,9 +1,10 @@
 interface IConfigParams {
     idleTimeoutTime?: number;
     timeoutPrecision?: number;
-    startCountdownTimerAt?: number;
+    startCountDownTimerAt?: number;
     localStorageKey?: string;
     timeoutCallback?: Function;
+    countDownCallback?: Function;
     logoutHREF?: string;
 }
 
@@ -18,15 +19,25 @@ export class InactivityLogout {
     private signOutHREF: string;
 
     private timeoutCallback: Function;
+    private countDownCallback: Function | boolean;
     private idleTimeoutID: number;
-    private startCountdownTimeoutID: string;
+    private countDownTimerID: number;
+    private startCountdownTimeoutID: number;
+    private currentTimerPrecision: number;
 
     constructor(params: IConfigParams = {}){
         // config var defaults
         // how long you can be idle for before we time you out
         this.idleTimeoutTime = params.idleTimeoutTime || 10000;
-        // when we start a countdown timer
-        this.startCountDownTimerAt = params.startCountdownTimerAt || 3000;
+        if((typeof(params.startCountDownTimerAt)) === 'number'){
+            if(params.startCountDownTimerAt > this.idleTimeoutTime) {
+                console.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
+                this.startCountDownTimerAt = this.idleTimeoutTime
+            } else {
+                this.startCountDownTimerAt = params.startCountDownTimerAt
+            }
+        }
+        this.countDownCallback = params.countDownCallback || false
         // custom local storage key
         this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
         // timeout callback
@@ -37,7 +48,7 @@ export class InactivityLogout {
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
 
-        this.start();
+        this.start(this.timeoutPrecision);
 
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
@@ -48,11 +59,18 @@ export class InactivityLogout {
         this.addEventListner(<IWindow>window, 'load', this);
     }
 
-    public start(): void {
+    public start(precision: number): void {
+        this.currentTimerPrecision = precision;
         this.setLastResetTimeStamp((new Date()).getTime());
         this.idleTimeoutID = window.setInterval(()=> {
             this.checkIdleTime()
-        }, this.timeoutPrecision);
+        }, precision);
+    }
+
+    public startCountDown(){
+        this.countDownTimerID = window.setInterval(() => {
+            this.checkIdleTime();
+        }, 1000)
     }
 
     public stop(): void {
@@ -67,6 +85,7 @@ export class InactivityLogout {
         this.stop();
     }
 
+    // see readme about why we use handleEvent
     private handleEvent(eventName: string): void {
         let currentTime = (new Date).getTime();
         this.setLastResetTimeStamp(currentTime);
@@ -85,9 +104,31 @@ export class InactivityLogout {
     checkIdleTime(){
         let currentTimeStamp = (new Date()).getTime();
         let lastResetTimeStamp = this.getLastResetTimeStamp();
-        let msDiff = currentTimeStamp - lastResetTimeStamp;
-        if(msDiff >= this.idleTimeoutTime) {
+        let milliSecondDiff = currentTimeStamp - lastResetTimeStamp;
+        let timeRemaining = this.idleTimeoutTime - milliSecondDiff;
+        this.checkTimerPrecision(timeRemaining);
+        if(timeRemaining <= this.startCountDownTimerAt){
+            this.countDownCallback(timeRemaining)
+        }
+        if(milliSecondDiff >= this.idleTimeoutTime) {
             this.timeout();
+        }
+    }
+
+    private checkTimerPrecision(timeRemaining: number) {
+        // when we are counting down we need to increase
+        // the interval precision to seconds
+        let increasePrecisionTime = this.startCountDownTimerAt + this.timeoutPrecision;
+        if(timeRemaining < increasePrecisionTime){
+            if(this.currentTimerPrecision !== 1000) {
+                this.stop();
+                this.start(1000);
+            }
+        } else {
+            if(this.currentTimerPrecision !== this.timeoutPrecision){
+               this.stop();
+               this.start(this.timeoutPrecision)
+            }
         }
     }
 

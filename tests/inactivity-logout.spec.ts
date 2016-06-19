@@ -1,8 +1,8 @@
 import {InactivityLogout} from '../src/inactivity-logout'
+// need to install jasmine clock and mock the date for testing
 describe('Inactivity logout -', () => {
 
     describe('Setup -', () => {
-
         it('should log to the console if local storage is not present', () => {
             spyOn(window.localStorage, 'setItem').and.throwError('Some error');
             let log = spyOn(window.console, 'log');
@@ -10,6 +10,14 @@ describe('Inactivity logout -', () => {
             IL.cleanup();
             IL = null;
             expect(log).toHaveBeenCalledWith('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS')
+        });
+
+        it('should log to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
+            let log = spyOn(window.console, 'log');
+            let IL = new InactivityLogout({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
+            IL.cleanup();
+            IL = null;
+            expect(log).toHaveBeenCalledWith('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime')
         });
 
         it('should attach event handlers to document.click, document.mousemove, document.keypress, window.load', () => {
@@ -23,6 +31,7 @@ describe('Inactivity logout -', () => {
             IL.cleanup();
             IL = null;
         });
+
     });
 
     describe('timing out -', () => {
@@ -59,6 +68,26 @@ describe('Inactivity logout -', () => {
                 jasmine.clock().uninstall();
             });
         });
+    });
+
+    describe('countdown - ', () => {
+        it('should start calling the countdown timer callback when the time reaches the startCountdownTimerAt value', () => {
+            jasmine.clock().install();
+            jasmine.clock().mockDate();
+            let callback = jasmine.createSpy('callback');
+            let IL = new InactivityLogout({idleTimeoutTime: 20000,startCountDownTimerAt: 10000, countDownCallback: callback});
+            jasmine.clock().tick(9000);
+            expect(callback).not.toHaveBeenCalled();
+            jasmine.clock().tick(1000);
+            expect(callback).toHaveBeenCalledWith(10000);
+            jasmine.clock().tick(1000);
+            expect(callback).toHaveBeenCalledWith(9000);
+            jasmine.clock().tick(1000);
+            expect(callback).toHaveBeenCalledWith(8000);
+            IL.cleanup();
+            IL = null;
+            jasmine.clock().uninstall();
+        })
     });
 
     describe('redirection - ', () => {
