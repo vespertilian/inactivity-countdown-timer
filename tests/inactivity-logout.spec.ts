@@ -79,11 +79,11 @@ describe('Inactivity logout -', () => {
             jasmine.clock().tick(9000);
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
-            expect(callback).toHaveBeenCalledWith(10000);
+            expect(callback).toHaveBeenCalledWith(10);
             jasmine.clock().tick(1000);
-            expect(callback).toHaveBeenCalledWith(9000);
+            expect(callback).toHaveBeenCalledWith(9);
             jasmine.clock().tick(1000);
-            expect(callback).toHaveBeenCalledWith(8000);
+            expect(callback).toHaveBeenCalledWith(8);
             IL.cleanup();
             IL = null;
             jasmine.clock().uninstall();
@@ -118,7 +118,7 @@ describe('Inactivity logout -', () => {
     });
 
     describe('callback - ', () => {
-        it('should execute a callback when the timeout expires a callback was passed in', () => {
+        it('should execute a callback when the timeout expires if a callback was passed in', () => {
             jasmine.clock().install();
             jasmine.clock().mockDate();
             let callback = jasmine.createSpy('callback');

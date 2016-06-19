@@ -13,7 +13,6 @@ export class InactivityLogout {
     private timeoutPrecision: number;
     private startCountDownTimerAt: number;
     private localStorageKey: string;
-    private idleSecondsTimer: number = null;
     private lastResetTimeStamp: number = (new Date()).getTime();
     private localStorage: WindowLocalStorage | boolean;
     private signOutHREF: string;
@@ -22,7 +21,6 @@ export class InactivityLogout {
     private countDownCallback: Function | boolean;
     private idleTimeoutID: number;
     private countDownTimerID: number;
-    private startCountdownTimeoutID: number;
     private currentTimerPrecision: number;
 
     constructor(params: IConfigParams = {}){
@@ -37,7 +35,7 @@ export class InactivityLogout {
                 this.startCountDownTimerAt = params.startCountDownTimerAt
             }
         }
-        this.countDownCallback = params.countDownCallback || false
+        this.countDownCallback = params.countDownCallback || false;
         // custom local storage key
         this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
         // timeout callback
@@ -107,8 +105,8 @@ export class InactivityLogout {
         let milliSecondDiff = currentTimeStamp - lastResetTimeStamp;
         let timeRemaining = this.idleTimeoutTime - milliSecondDiff;
         this.checkTimerPrecision(timeRemaining);
-        if(timeRemaining <= this.startCountDownTimerAt){
-            this.countDownCallback(timeRemaining)
+        if(this.countDownCallback && (timeRemaining <= this.startCountDownTimerAt)){
+            this.countDownCallback(Math.abs(Math.ceil(timeRemaining/1000)));
         }
         if(milliSecondDiff >= this.idleTimeoutTime) {
             this.timeout();
