@@ -181,13 +181,12 @@ export class InactivityLogout {
 
     private detectAndAssignLocalStorage(): WindowLocalStorage | boolean {
         let uid: string = (new Date).getTime().toString();
-        // todo this is broken never assigning to storage
-        let storage: WindowLocalStorage;
+        let storage: Storage = window.localStorage;
         let result: string;
         try {
-            localStorage.setItem(uid,uid);
-            result = localStorage.getItem(uid) == uid;
-            localStorage.removeItem(uid);
+            storage.setItem(uid,uid);
+            result = storage.getItem(uid) == uid;
+            storage.removeItem(uid);
             return result && storage;
         } catch(exception) {
             console.log('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS')
