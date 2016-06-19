@@ -3,7 +3,7 @@ describe('Inactivity logout -', () => {
 
     describe('Setup -', () => {
 
-        it('should throw an error if local storage is not present and log to the console', () => {
+        it('should log to the console if local storage is not present', () => {
             spyOn(window.localStorage, 'setItem').and.throwError('Some error');
             let log = spyOn(window.console, 'log');
             let IL = new InactivityLogout();
@@ -28,8 +28,10 @@ describe('Inactivity logout -', () => {
     describe('timing out -', () => {
         it('should call timeout when the idleTimeout is finished', () => {
             jasmine.clock().install();
+            jasmine.clock().mockDate();
             let IL = new InactivityLogout({idleTimeoutTime: 2000});
-            let timeout = spyOn(IL, 'timeout');
+            // we need to call through so the interval timer stops watching
+            let timeout = spyOn(IL, 'timeout').and.callThrough();
             expect(timeout).not.toHaveBeenCalled();
             jasmine.clock().tick(2001);
             expect(timeout).toHaveBeenCalled();
@@ -41,14 +43,16 @@ describe('Inactivity logout -', () => {
         it('should reset the idleTimeout if one of the event handlers get\s called', () => {
             ['click', 'mousemove', 'keypress'].forEach((mouseEvent) => {
                 jasmine.clock().install();
+                jasmine.clock().mockDate();
                 let IL = new InactivityLogout({idleTimeoutTime: 2000});
-                let timeout = spyOn(IL, 'timeout');
+                // we need to call through so the interval timer stops watching
+                let timeout = spyOn(IL, 'timeout').and.callThrough();
                 jasmine.clock().tick(1001); // 1001 total time
                 expect(timeout).not.toHaveBeenCalled();
                 dispatchMouseEvent(mouseEvent); // timer will reset and initialise at 2000
                 jasmine.clock().tick(1000); // 2001 total time
                 expect(timeout).not.toHaveBeenCalled();
-                jasmine.clock().tick(2000); // 4001
+                jasmine.clock().tick(4000); // 3001
                 expect(timeout).toHaveBeenCalledTimes(1);
                 IL.cleanup();
                 IL = null;
@@ -60,6 +64,7 @@ describe('Inactivity logout -', () => {
     describe('redirection - ', () => {
         it('should redirect when the timeout expires if a url was passed in', () => {
             jasmine.clock().install();
+            jasmine.clock().mockDate();
             let IL = new InactivityLogout({idleTimeoutTime: 2000, logoutHREF: 'logout.html'});
             let redirectFunction = spyOn(IL, 'redirect');
             expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
@@ -72,6 +77,7 @@ describe('Inactivity logout -', () => {
 
         it('should not redirect when the timeout expires if a url was not passed in', () => {
             jasmine.clock().install();
+            jasmine.clock().mockDate();
             let IL = new InactivityLogout({idleTimeoutTime: 2000});
             let redirectFunction = spyOn(IL, 'redirect');
             jasmine.clock().tick(2001);
@@ -85,6 +91,7 @@ describe('Inactivity logout -', () => {
     describe('callback - ', () => {
         it('should execute a callback when the timeout expires a callback was passed in', () => {
             jasmine.clock().install();
+            jasmine.clock().mockDate();
             let callback = jasmine.createSpy('callback');
             let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: callback});
             expect(callback).not.toHaveBeenCalled();

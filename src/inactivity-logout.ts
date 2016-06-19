@@ -1,5 +1,6 @@
 interface IConfigParams {
     idleTimeoutTime?: number;
+    timeoutPrecision?: number;
     startCountdownTimerAt?: number;
     localStorageKey?: string;
     timeoutCallback?: Function;
@@ -7,8 +8,8 @@ interface IConfigParams {
 }
 
 export class InactivityLogout {
-
     private idleTimeoutTime: number;
+    private timeoutPrecision: number;
     private startCountDownTimerAt: number;
     private localStorageKey: string;
     private idleSecondsTimer: number = null;
@@ -31,6 +32,7 @@ export class InactivityLogout {
         // timeout callback
         this.timeoutCallback = params.timeoutCallback;
         this.signOutHREF = params.logoutHREF || false;
+        this.timeoutPrecision = params.timeoutPrecision || 1000;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
@@ -47,13 +49,14 @@ export class InactivityLogout {
     }
 
     public start(): void {
-        this.idleTimeoutID = window.setTimeout(()=> {
-            this.timeout()
-        }, this.idleTimeoutTime);
+        this.setLastResetTimeStamp((new Date()).getTime());
+        this.idleTimeoutID = window.setInterval(()=> {
+            this.checkIdleTime()
+        }, this.timeoutPrecision);
     }
 
     public stop(): void {
-        window.clearTimeout(this.idleTimeoutID);
+        window.clearInterval(this.idleTimeoutID);
     }
 
     public cleanup(): void {
@@ -65,11 +68,12 @@ export class InactivityLogout {
     }
 
     private handleEvent(eventName: string): void {
-        this.stop();
-        this.start();
+        let currentTime = (new Date).getTime();
+        this.setLastResetTimeStamp(currentTime);
     }
 
     public timeout(): void {
+        this.cleanup();
         if(this.timeoutCallback){
             this.timeoutCallback();
         }
@@ -78,26 +82,35 @@ export class InactivityLogout {
         }
     }
 
-    //getLastResetTimeStamp(): number {
-    //    let lastResetTimeStamp: number = 0;
-    //    if(this.localStorage){
-    //        lastResetTimeStamp = parseInt(this.localStorage[this.localStorageKey], 10);
-    //        if(isNaN(lastResetTimeStamp) || lastResetTimeStamp < 0) {
-    //            lastResetTimeStamp = (new Date()).getTime()
-    //        }
-    //    } else {
-    //        lastResetTimeStamp = this.lastResetTimeStamp;
-    //    }
-    //    return lastResetTimeStamp;
-    //}
+    checkIdleTime(){
+        let currentTimeStamp = (new Date()).getTime();
+        let lastResetTimeStamp = this.getLastResetTimeStamp();
+        let msDiff = currentTimeStamp - lastResetTimeStamp;
+        if(msDiff >= this.idleTimeoutTime) {
+            this.timeout();
+        }
+    }
 
-    //setLastResetTimeStamp(timestamp: number): void {
-    //    if(this.localStorage){
-    //        this.localStorage[this.localStorageKey] = timestamp.toString();
-    //    } else {
-    //        this.lastResetTimeStamp = timestamp;
-    //    }
-    //}
+    private getLastResetTimeStamp(): number {
+        let lastResetTimeStamp: number = 0;
+        if(this.localStorage){
+            lastResetTimeStamp = parseInt(this.localStorage[this.localStorageKey], 10);
+            if(isNaN(lastResetTimeStamp) || lastResetTimeStamp < 0) {
+                lastResetTimeStamp = (new Date()).getTime()
+            }
+        } else {
+            lastResetTimeStamp = this.lastResetTimeStamp;
+        }
+        return lastResetTimeStamp;
+    }
+
+    private setLastResetTimeStamp(timestamp: number): void {
+        if(this.localStorage){
+            this.localStorage[this.localStorageKey] = timestamp.toString();
+        } else {
+            this.lastResetTimeStamp = timestamp;
+        }
+    }
 
     private addEventListner(element: IWindow | Document, eventName: string, eventHandler): void {
         if(element.addEventListener) {
