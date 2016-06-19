@@ -1,4 +1,5 @@
 import {InactivityLogout} from './inactivity-logout'
+import {IConfigParams} from '../src/inactivity-logout'
 
 declare var ON_DEV: boolean;
 if(ON_DEV){
@@ -7,15 +8,23 @@ if(ON_DEV){
         function timeoutCallback(){
             console.log('timeout callback fired')
         }
+
         let updateElement = document.getElementById('timeRemaining');
+
         function countDownCallback(timeRemaining){
-            updateElement.innerHTML = (timeRemaining)
+            updateElement.innerHTML = (timeRemaining + ' seconds')
         }
-        let settings = {
+
+        function countDownCancelledCallback(){
+            updateElement.innerHTML = 'CountDown cancelled'
+        }
+
+        let settings: IConfigParams = {
             idleTimeoutTime: 15000,
             startCountDownTimerAt: 10000,
             timeoutCallback: timeoutCallback,
-            countDownCallback: countDownCallback
+            countDownCallback: countDownCallback,
+            countDownCancelledCallback: countDownCancelledCallback
         };
         new InactivityLogout(settings)
     });

@@ -1,10 +1,11 @@
-interface IConfigParams {
+export interface IConfigParams {
     idleTimeoutTime?: number;
     timeoutPrecision?: number;
     startCountDownTimerAt?: number;
     localStorageKey?: string;
     timeoutCallback?: Function;
     countDownCallback?: Function;
+    countDownCancelledCallback?: Function;
     logoutHREF?: string;
 }
 
@@ -16,9 +17,11 @@ export class InactivityLogout {
     private lastResetTimeStamp: number = (new Date()).getTime();
     private localStorage: WindowLocalStorage | boolean;
     private signOutHREF: string;
+    private countingDown: boolean = false;
 
-    private timeoutCallback: Function;
+    private timeoutCallback: Function | boolean;
     private countDownCallback: Function | boolean;
+    private countDownCancelledCallback: Function | boolean;
     private idleTimeoutID: number;
     private countDownTimerID: number;
     private currentTimerPrecision: number;
@@ -35,11 +38,11 @@ export class InactivityLogout {
                 this.startCountDownTimerAt = params.startCountDownTimerAt
             }
         }
+
+        this.timeoutCallback = params.timeoutCallback || false;
         this.countDownCallback = params.countDownCallback || false;
-        // custom local storage key
+        this.countDownCancelledCallback = params.countDownCancelledCallback || false;
         this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
-        // timeout callback
-        this.timeoutCallback = params.timeoutCallback;
         this.signOutHREF = params.logoutHREF || false;
         this.timeoutPrecision = params.timeoutPrecision || 1000;
 
@@ -63,12 +66,6 @@ export class InactivityLogout {
         this.idleTimeoutID = window.setInterval(()=> {
             this.checkIdleTime()
         }, precision);
-    }
-
-    public startCountDown(){
-        this.countDownTimerID = window.setInterval(() => {
-            this.checkIdleTime();
-        }, 1000)
     }
 
     public stop(): void {
@@ -105,16 +102,27 @@ export class InactivityLogout {
         let milliSecondDiff = currentTimeStamp - lastResetTimeStamp;
         let timeRemaining = this.idleTimeoutTime - milliSecondDiff;
         this.checkTimerPrecision(timeRemaining);
-        if(this.countDownCallback && (timeRemaining <= this.startCountDownTimerAt)){
-            this.countDownCallback(Math.abs(Math.ceil(timeRemaining/1000)));
-        }
+        this.handleCountDown(timeRemaining);
         if(milliSecondDiff >= this.idleTimeoutTime) {
             this.timeout();
         }
     }
 
+    private handleCountDown(timeRemaining: number) {
+        if(this.countDownCallback && (timeRemaining <= this.startCountDownTimerAt)){
+            this.countingDown = true;
+            this.countDownCallback(Math.abs(Math.ceil(timeRemaining/1000)));
+        } else if (this.countingDown){
+            // if we are alread countingdown
+            // alert we no longer are
+            this.countDownCancelledCallback();
+            this.countingDown = false;
+        }
+    }
+
+
     private checkTimerPrecision(timeRemaining: number) {
-        // when we are counting down we need to increase
+        // when we are counting down we may need to increase
         // the interval precision to seconds
         let increasePrecisionTime = this.startCountDownTimerAt + this.timeoutPrecision;
         if(timeRemaining < increasePrecisionTime){

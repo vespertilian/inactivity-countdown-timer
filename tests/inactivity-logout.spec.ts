@@ -1,4 +1,5 @@
 import {InactivityLogout} from '../src/inactivity-logout'
+import {IConfigParams} from '../src/inactivity-logout'
 // need to install jasmine clock and mock the date for testing
 describe('Inactivity logout -', () => {
 
@@ -75,7 +76,12 @@ describe('Inactivity logout -', () => {
             jasmine.clock().install();
             jasmine.clock().mockDate();
             let callback = jasmine.createSpy('callback');
-            let IL = new InactivityLogout({idleTimeoutTime: 20000,startCountDownTimerAt: 10000, countDownCallback: callback});
+            let settings: IConfigParams = {
+                idleTimeoutTime: 20000,
+                startCountDownTimerAt: 10000,
+                countDownCallback: callback
+            };
+            let IL = new InactivityLogout(settings);
             jasmine.clock().tick(9000);
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
@@ -84,6 +90,33 @@ describe('Inactivity logout -', () => {
             expect(callback).toHaveBeenCalledWith(9);
             jasmine.clock().tick(1000);
             expect(callback).toHaveBeenCalledWith(8);
+            expect(callback).toHaveBeenCalledTimes(3)
+            IL.cleanup();
+            IL = null;
+            jasmine.clock().uninstall();
+        });
+
+        it('should call a countdown cancelled callback when the countdown is aborted', () => {
+            jasmine.clock().install();
+            jasmine.clock().mockDate();
+            let countDownCallback = jasmine.createSpy('countDownCallback');
+            let countDownCancelledCallback = jasmine.createSpy('countDownCancelledCallback');
+            let settings: IConfigParams = {
+                idleTimeoutTime: 20000,
+                startCountDownTimerAt: 10000,
+                countDownCallback: countDownCallback,
+                countDownCancelledCallback: countDownCancelledCallback
+            };
+            let IL = new InactivityLogout(settings);
+            jasmine.clock().tick(9000);
+            expect(countDownCallback).not.toHaveBeenCalled();
+            jasmine.clock().tick(1000);
+            expect(countDownCallback).toHaveBeenCalledWith(10);
+            jasmine.clock().tick(1000);
+            expect(countDownCallback).toHaveBeenCalledWith(9);
+            dispatchMouseEvent('click'); // timer will reset and initialise at 20000
+            jasmine.clock().tick(2000);
+            expect(countDownCancelledCallback).toHaveBeenCalled();
             IL.cleanup();
             IL = null;
             jasmine.clock().uninstall();
