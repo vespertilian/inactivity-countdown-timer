@@ -165,8 +165,32 @@ describe('Inactivity logout -', () => {
         });
     });
 
-    // count down timer should be a smaller number than idleTimeout
-    // test that if local storage has been change  by another tab the ending timeout does not fire
+    describe('localstorage - ', () => {
+        it('should react to updates by other windows through local storage', () => {
+            jasmine.clock().install();
+            jasmine.clock().mockDate();
+            let callback = jasmine.createSpy('callback');
+            let localStorageKey = 'idleTimeoutTimeKey';
+            let settings = {
+                idleTimeoutTime: 5000,
+                timeoutCallback: callback,
+                localStorageKey: localStorageKey
+            };
+            let IL = new InactivityLogout(settings);
+            jasmine.clock().tick(4000);
+            expect(callback).not.toHaveBeenCalled();
+            // reset the time
+            let currentMockTime = (new Date()).getTime().toString();
+            localStorage.setItem(localStorageKey,currentMockTime);
+            jasmine.clock().tick(4000);
+            expect(callback).not.toHaveBeenCalled();
+            jasmine.clock().tick(5000);
+            expect(callback).toHaveBeenCalled();
+            IL.cleanup();
+            IL = null;
+            jasmine.clock().uninstall();
+        })
+    })
 
 });
 
