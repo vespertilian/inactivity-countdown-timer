@@ -122,8 +122,8 @@ export class InactivityLogout {
 
 
     private checkTimerPrecision(timeRemaining: number) {
-        // when we are counting down we may need to increase
-        // the interval precision to seconds
+        // when we are counting down we want to
+        // increase the interval precision to seconds
         let increasePrecisionTime = this.startCountDownTimerAt + this.timeoutPrecision;
         if(timeRemaining < increasePrecisionTime){
             if(this.currentTimerPrecision !== 1000) {
