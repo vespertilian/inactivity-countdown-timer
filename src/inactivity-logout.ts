@@ -3,10 +3,20 @@ export interface IConfigParams {
     timeoutPrecision?: number;
     startCountDownTimerAt?: number;
     localStorageKey?: string;
-    timeoutCallback?: Function;
-    countDownCallback?: Function;
-    countDownCancelledCallback?: Function;
+    timeoutCallback?(): void;
+    countDownCallback?(secondsLeft: number): void;
+    countDownCancelledCallback?(): void;
     logoutHREF?: string;
+}
+
+interface IWindow {
+    addEventListener(type: string, listener: any, useCapture?: boolean): void;
+    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
+}
+
+interface IDocument {
+    addEventListener(type: string, listener: any, useCapture?: boolean): void;
+    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
 }
 
 require('./ie8addEventListener');
@@ -16,18 +26,17 @@ export class InactivityLogout {
     private startCountDownTimerAt: number;
     private localStorageKey: string;
     private lastResetTimeStamp: number = (new Date()).getTime();
-    private localStorage: Storage = null;
+    private localStorage: Storage;
     private signOutHREF: string;
     private countingDown: boolean = false;
 
-    private timeoutCallback: Function | boolean;
-    private countDownCallback: Function | boolean;
-    private countDownCancelledCallback: Function | boolean;
+    private timeoutCallback: () => void;
+    private countDownCallback: (secondsLeft: number) => void;
+    private countDownCancelledCallback: () => void;
     private idleTimeoutID: number;
-    private countDownTimerID: number;
     private currentTimerPrecision: number;
 
-    constructor(params: IConfigParams = {}){
+    constructor(params: IConfigParams = {}) {
         // config var defaults
         // how long you can be idle for before we time you out
         this.idleTimeoutTime = params.idleTimeoutTime || 10000;
@@ -40,11 +49,11 @@ export class InactivityLogout {
             }
         }
 
-        this.timeoutCallback = params.timeoutCallback || false;
-        this.countDownCallback = params.countDownCallback || false;
-        this.countDownCancelledCallback = params.countDownCancelledCallback || false;
+        this.timeoutCallback = params.timeoutCallback;
+        this.countDownCallback = params.countDownCallback;
+        this.countDownCancelledCallback = params.countDownCancelledCallback;
         this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
-        this.signOutHREF = params.logoutHREF || false;
+        this.signOutHREF = params.logoutHREF;
         this.timeoutPrecision = params.timeoutPrecision || 1000;
 
         // setup local storage
@@ -52,23 +61,25 @@ export class InactivityLogout {
 
         this.start(this.timeoutPrecision);
 
+        let Idocument: IDocument = document;
+        let Iwindow: IWindow = window;
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
         // see README.md for more on why we are passing this
-        document.addEventListener('click', this, false);
-        document.addEventListener('mousemove', this, false);
-        document.addEventListener('keypress', this, false);
-        window.addEventListener('load', this, false); // effectively a no-op
-        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
+        Idocument.addEventListener('click', this, false);
+        Idocument.addEventListener('mousemove', this, false);
+        Idocument.addEventListener('keypress', this, false);
+        Iwindow.addEventListener('load', this, false); // effectively a no-op
+        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         // this fixes a bug in ie11 where the local storage does not sync
-        window.addEventListener('storage', function(e) {}) // effectively a no-op
+        Iwindow.addEventListener('storage', function() {}); // effectively a no-op
     }
 
     public start(precision: number): void {
         this.currentTimerPrecision = precision;
         this.setLastResetTimeStamp((new Date()).getTime());
-        this.idleTimeoutID = window.setInterval(()=> {
-            this.checkIdleTime()
+        this.idleTimeoutID = window.setInterval(() => {
+            this.checkIdleTime();
         }, precision);
     }
 
@@ -77,19 +88,21 @@ export class InactivityLogout {
     }
 
     public cleanup(): void {
-        document.removeEventListener('click', this, false);
-        document.removeEventListener('mousemove', this, false);
-        document.removeEventListener('keypress', this, false);
-        window.removeEventListener('load', this, false); // effectively a no-op
+        let Idocument: IDocument = document;
+        let Iwindow: IWindow = window;
+        Idocument.removeEventListener('click', this, false);
+        Idocument.removeEventListener('mousemove', this, false);
+        Idocument.removeEventListener('keypress', this, false);
+        Iwindow.removeEventListener('load', this, false); // effectively a no-op
 
         //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         // this fixes a bug in ie11 where the local storage does not sync
-        window.removeEventListener('storage', function(e) {}) // effectively a no-op
+        Iwindow.removeEventListener('storage', function() {}); // effectively a no-op
         this.stop();
     }
 
     // see readme about why we use handleEvent
-    private handleEvent(eventName: string): void {
+    private handleEvent(): void {
         let currentTime = (new Date).getTime();
         this.setLastResetTimeStamp(currentTime);
     }
@@ -175,11 +188,11 @@ export class InactivityLogout {
     }
 
     private detectAndAssignLocalStorage(): Storage {
-        let uid: string = (new Date).getTime().toString() + 'detectAndAssignLocalStorage';
+        let uid: string = (new Date()).getTime().toString() + 'detectAndAssignLocalStorage';
         let storage: Storage = localStorage;
-        let result: string;
+        let result: boolean;
         try {
-            storage.setItem(uid,uid);
+            storage.setItem( uid, uid);
             result = storage.getItem(uid) === uid;
             storage.removeItem(uid);
             return result && storage;
@@ -190,19 +203,10 @@ export class InactivityLogout {
 
     // cannot mock location changes
     // so little function allows us to verify redirect is called
-    private redirect(url) {
-        if(url){
+    private redirect (url: string): void {
+        if (url) {
             window.location.href = url;
         }
     }
 }
 
-interface Window {
-    addEventListener(type: string, listener: any, useCapture?: boolean): void;
-    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
-}
-
-interface Document {
-    addEventListener(type: string, listener: any, useCapture?: boolean): void;
-    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
-}

@@ -11,18 +11,18 @@ import {IConfigParams} from '../src/inactivity-logout'
 declare var ON_DEV: boolean;
 if(ON_DEV){
     console.log('In development mode loading demo code');
-    document.addEventListener("DOMContentLoaded", function(event) {
+    document.addEventListener("DOMContentLoaded", function() {
         function timeoutCallback(){
             console.log('timeout callback fired')
         }
 
         let updateElement = document.getElementById('timeRemaining');
 
-        function countDownCallback(timeRemaining){
+        function countDownCallback(timeRemaining: number): void {
             updateElement.innerHTML = (timeRemaining + ' seconds')
         }
 
-        function countDownCancelledCallback(){
+        function countDownCancelledCallback(): void {
             updateElement.innerHTML = 'CountDown cancelled'
         }
 

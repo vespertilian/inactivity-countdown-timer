@@ -112,7 +112,7 @@ module.exports = function(config) {
         settings.singleRun = true;
         settings.concurrency = 3;
     } else {
-        //settings.browsers = ['Chrome'];
+        settings.browsers = ['Chrome'];
         settings.singleRun = false;
         settings.concurrency = Infinity;
     }

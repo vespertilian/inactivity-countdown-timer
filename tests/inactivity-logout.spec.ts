@@ -25,6 +25,8 @@ describe('Inactivity logout -', () => {
             IL = null;
         });
 
+        // todo: test that cleanup removes the event listeners
+
     });
 
     describe('timing out -', () => {
@@ -43,7 +45,7 @@ describe('Inactivity logout -', () => {
         });
 
         it('should reset the idleTimeout if one of the event handlers get\s called', () => {
-            ['click', 'mousemove', 'keypress'].forEach((mouseEvent) => {
+            ['click', 'mousemove', 'keypress'].forEach(() => {
                 jasmine.clock().install();
                 jasmine.clock().mockDate();
                 let IL = new InactivityLogout({idleTimeoutTime: 2000});
@@ -188,10 +190,10 @@ describe('Inactivity logout -', () => {
 
 
 // see this link for eventClasses https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent#Notes
-function dispatchMouseEvent(eventName){
+function dispatchMouseEvent(eventName: string): void {
     // http://stackoverflow.com/questions/2490825/how-to-trigger-event-in-javascript
-    let eventClass = 'MouseEvents';
-    let docEvent;
+    let eventClass: string = 'MouseEvents';
+    let docEvent: any;
     if(document.createEvent){
         docEvent = document.createEvent(eventClass);
         docEvent.initEvent(eventName, true, true);
@@ -202,7 +204,7 @@ function dispatchMouseEvent(eventName){
 }
 
 // IE8 fix
-function dispatchEvent(element, event: Event){
+function dispatchEvent(element: any, event: Event): void {
     if(element['dispatchEvent']){
         element.dispatchEvent(event, true)
     } else if(element['fireEvent']){
