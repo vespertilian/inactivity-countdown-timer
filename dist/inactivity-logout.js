@@ -46,9 +46,11 @@
 
 	"use strict";
 	// Fix logging for ie8 when dev tools are not open
-	if (typeof console == "undefined") {
-	    this.console = { log: function () { } };
-	}
+	(function () {
+	    if (typeof console == "undefined") {
+	        this.console = { log: function () { } };
+	    }
+	})();
 	var inactivity_logout_1 = __webpack_require__(1);
 	exports.InactivityLogout = inactivity_logout_1.InactivityLogout;
 	if (false) {

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
     "saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
-    "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base dist/ --host 0.0.0.0"
+    "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base dist/ --host 0.0.0.0",
+    "build": "webpack"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
