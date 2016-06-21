@@ -15,7 +15,7 @@ export class InactivityLogout {
     private startCountDownTimerAt: number;
     private localStorageKey: string;
     private lastResetTimeStamp: number = (new Date()).getTime();
-    private localStorage: WindowLocalStorage | boolean;
+    private localStorage: WindowLocalStorage | boolean = false;
     private signOutHREF: string;
     private countingDown: boolean = false;
 
@@ -181,7 +181,7 @@ export class InactivityLogout {
 
     private detectAndAssignLocalStorage(): WindowLocalStorage | boolean {
         let uid: string = (new Date).getTime().toString();
-        let storage: Storage = window.localStorage;
+        let storage: Storage = localStorage;
         let result: string;
         try {
             storage.setItem(uid,uid);

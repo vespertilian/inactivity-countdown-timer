@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
+    "saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
     "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base dist/ --host 0.0.0.0"
   },
   "author": "",
@@ -16,6 +17,7 @@
     "karma": "0.13.22",
     "karma-chrome-launcher": "1.0.1",
     "karma-jasmine": "1.0.2",
+    "karma-sauce-launcher": "0.3.1",
     "karma-spec-reporter": "0.0.26",
     "karma-webpack": "1.7.0",
     "ts-loader": "0.8.2",
