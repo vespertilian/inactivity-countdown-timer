@@ -1,3 +1,8 @@
+// Fix logging for ie8 when dev tools are not open
+if (typeof console == "undefined") {
+    this.console = { log: function () { } };
+}
+
 import {InactivityLogout} from './inactivity-logout'
 import {IConfigParams} from '../src/inactivity-logout'
 

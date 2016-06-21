@@ -1,18 +1,10 @@
+require('./ie8forEachPolyfill');
 import {InactivityLogout} from '../src/inactivity-logout'
 import {IConfigParams} from '../src/inactivity-logout'
 // need to install jasmine clock and mock the date for testing
 describe('Inactivity logout -', () => {
 
     describe('Setup -', () => {
-        xit('should log to the console if local storage is not present', () => {
-            //spyOn(window.localStorage, 'setItem').and.throwError('Some error');
-            //let log = spyOn(window.console, 'log');
-            //let IL = new InactivityLogout();
-            //expect(log).toHaveBeenCalledWith('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS');
-            //IL.cleanup();
-            //IL = null;
-        });
-
         it('should log to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
             let log = spyOn(window.console, 'log');
             let IL = new InactivityLogout({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
@@ -59,7 +51,7 @@ describe('Inactivity logout -', () => {
                 let timeout = spyOn(IL, 'timeout').and.callThrough();
                 jasmine.clock().tick(1001); // 1001 total time
                 expect(timeout).not.toHaveBeenCalled();
-                dispatchMouseEvent(mouseEvent); // timer will reset and initialise at 2000
+                dispatchMouseEvent('click'); // timer will reset and initialise at 2000
                 jasmine.clock().tick(1000); // 2001 total time
                 expect(timeout).not.toHaveBeenCalled();
                 jasmine.clock().tick(4000); // 3001
@@ -199,8 +191,13 @@ describe('Inactivity logout -', () => {
 function dispatchMouseEvent(eventName){
     // http://stackoverflow.com/questions/2490825/how-to-trigger-event-in-javascript
     let eventClass = 'MouseEvents';
-    let docEvent = document.createEvent(eventClass);
-    docEvent.initEvent(eventName, true, true);
+    let docEvent;
+    if(document.createEvent){
+        docEvent = document.createEvent(eventClass);
+        docEvent.initEvent(eventName, true, true);
+    } else {
+        docEvent = eventName;
+    }
     dispatchEvent(document, docEvent);
 }
 
@@ -209,7 +206,7 @@ function dispatchEvent(element, event: Event){
     if(element['dispatchEvent']){
         element.dispatchEvent(event, true)
     } else if(element['fireEvent']){
-        element.fireEvent('on' + event.type); // ie8 fix
+        element.fireEvent('on' + event); // ie8 fix
     } else {
         throw new Error('No dispatch event method in browser')
     }

@@ -9,13 +9,14 @@ export interface IConfigParams {
     logoutHREF?: string;
 }
 
+require('./ie8addEventListener');
 export class InactivityLogout {
     private idleTimeoutTime: number;
     private timeoutPrecision: number;
     private startCountDownTimerAt: number;
     private localStorageKey: string;
     private lastResetTimeStamp: number = (new Date()).getTime();
-    private localStorage: WindowLocalStorage | boolean = false;
+    private localStorage: Storage = null;
     private signOutHREF: string;
     private countingDown: boolean = false;
 
@@ -54,10 +55,13 @@ export class InactivityLogout {
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
         // see README.md for more on why we are passing this
-        this.addEventListner(document, 'click', this);
-        this.addEventListner(document, 'mousemove', this);
-        this.addEventListner(document, 'keypress', this);
-        this.addEventListner(<IWindow>window, 'load', this);
+        document.addEventListener('click', this, false);
+        document.addEventListener('mousemove', this, false);
+        document.addEventListener('keypress', this, false);
+        window.addEventListener('load', this, false); // effectively a no-op
+        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
+        // this fixes a bug in ie11 where the local storage does not sync
+        window.addEventListener('storage', function(e) {}) // effectively a no-op
     }
 
     public start(precision: number): void {
@@ -73,10 +77,14 @@ export class InactivityLogout {
     }
 
     public cleanup(): void {
-        this.removeEventListner(document, 'click', this);
-        this.removeEventListner(document, 'mousemove', this);
-        this.removeEventListner(document, 'keypress', this);
-        this.removeEventListner(<IWindow>window, 'load', this);
+        document.removeEventListener('click', this, false);
+        document.removeEventListener('mousemove', this, false);
+        document.removeEventListener('keypress', this, false);
+        window.removeEventListener('load', this, false); // effectively a no-op
+
+        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
+        // this fixes a bug in ie11 where the local storage does not sync
+        window.removeEventListener('storage', function(e) {}) // effectively a no-op
         this.stop();
     }
 
@@ -113,7 +121,7 @@ export class InactivityLogout {
             this.countingDown = true;
             this.countDownCallback(Math.abs(Math.ceil(timeRemaining/1000)));
         } else if (this.countingDown){
-            // if we are alread countingdown
+            // if we are already counting down
             // alert we no longer are
             this.countDownCancelledCallback();
             this.countingDown = false;
@@ -139,11 +147,14 @@ export class InactivityLogout {
     }
 
     private getLastResetTimeStamp(): number {
-        let lastResetTimeStamp: number = 0;
+        let lastResetTimeStamp: number;
         if(this.localStorage){
-            lastResetTimeStamp = parseInt(this.localStorage[this.localStorageKey], 10);
-            if(isNaN(lastResetTimeStamp) || lastResetTimeStamp < 0) {
-                lastResetTimeStamp = (new Date()).getTime()
+            let lastResetTimeStampString: string;
+            try {
+                lastResetTimeStampString = this.localStorage.getItem(this.localStorageKey);
+                lastResetTimeStamp = parseInt(lastResetTimeStampString, 10)
+            } catch(error) {
+                console.log('Error getting last reset timestamp', error)
             }
         } else {
             lastResetTimeStamp = this.lastResetTimeStamp;
@@ -153,43 +164,27 @@ export class InactivityLogout {
 
     private setLastResetTimeStamp(timestamp: number): void {
         if(this.localStorage){
-            this.localStorage[this.localStorageKey] = timestamp.toString();
+            try{
+                this.localStorage.setItem(this.localStorageKey, timestamp.toString());
+            } catch (error){
+                console.log('Error setting last reset timestamp', error)
+            }
         } else {
             this.lastResetTimeStamp = timestamp;
         }
     }
 
-    private addEventListner(element: IWindow | Document, eventName: string, eventHandler): void {
-        if(element.addEventListener) {
-            element.addEventListener(eventName, eventHandler, false)
-        }
-        else if (element.attachEvent) {
-            element.attachEvent('on' + eventName, eventHandler)
-        }
-        // else do nothing.
-    }
-
-    private removeEventListner(element: IWindow | Document, eventName: string, eventHandler): void {
-        if(element.removeEventListener) {
-            element.removeEventListener(eventName, eventHandler)
-        }
-        else if (element.attachEvent) {
-            element.attachEvent('on' + eventName, eventHandler)
-        }
-        // else do nothing.
-    }
-
-    private detectAndAssignLocalStorage(): WindowLocalStorage | boolean {
-        let uid: string = (new Date).getTime().toString();
+    private detectAndAssignLocalStorage(): Storage {
+        let uid: string = (new Date).getTime().toString() + 'detectAndAssignLocalStorage';
         let storage: Storage = localStorage;
         let result: string;
         try {
             storage.setItem(uid,uid);
-            result = storage.getItem(uid) == uid;
+            result = storage.getItem(uid) === uid;
             storage.removeItem(uid);
             return result && storage;
         } catch(exception) {
-            console.log('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS')
+            console.log('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
         }
     }
 
@@ -202,20 +197,12 @@ export class InactivityLogout {
     }
 }
 
-interface IWindow extends Window {
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    // This is a proprietary Microsoft Internet Explorer alternative
-    // to the standard EventTarget.addEventListener() method.
-    // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/attachEvent
-    attachEvent(eventNameWithOn, callback): void;
+interface Window {
+    addEventListener(type: string, listener: any, useCapture?: boolean): void;
+    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
 }
 
 interface Document {
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    removeEventListener(type: string, listener?: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    // This is a proprietary Microsoft Internet Explorer alternative
-    // to the standard EventTarget.addEventListener() method.
-    // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/attachEvent
-    attachEvent(eventNameWithOn, callback): void;
+    addEventListener(type: string, listener: any, useCapture?: boolean): void;
+    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
 }

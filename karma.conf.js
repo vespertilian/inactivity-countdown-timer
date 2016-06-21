@@ -24,35 +24,41 @@ module.exports = function(config) {
             browserName: 'firefox',
             version: '45'
         },
-        sl_ios_safari: {
-            base: 'SauceLabs',
-            browserName: 'iphone',
-            platform: 'OS X 10.9',
-            version: '7.1'
-        },
-        xp_ie8: {
+        w7_ie8: {
             base: 'SauceLabs',
             browserName: 'internet explorer',
             platform: 'Windows 7',
             version: '8'
         },
-        xp_ie9: {
+        w7_ie9: {
             base: 'SauceLabs',
             browserName: 'internet explorer',
             platform: 'Windows 7',
             version: '9'
         },
-        xp_ie10: {
+        w7_ie10: {
             base: 'SauceLabs',
             browserName: 'internet explorer',
             platform: 'Windows 7',
             version: '10'
         },
-        xp_ie11: {
+        w7_ie11: {
             base: 'SauceLabs',
             browserName: 'internet explorer',
             platform: 'Windows 7',
             version: '11'
+        },
+        w10_edge: {
+            base: 'SauceLabs',
+            browserName: 'MicrosoftEdge',
+            platform: 'Windows 10',
+            version: '13'
+        },
+        osX_safari: {
+            base: 'SauceLabs',
+            browserName: 'safari',
+            platform: 'OS X 10.11',
+            version: '9.0'
         }
     };
 
@@ -99,14 +105,16 @@ module.exports = function(config) {
         }
     };
 
-
     if(process.env.SAUCELABS === 'true'){
+        settings.captureTimeout = 120000;
         settings.customLaunchers = customLaunchers;
         settings.browsers = Object.keys(customLaunchers);
         settings.singleRun = true;
+        settings.concurrency = 3;
     } else {
-        settings.browsers = ['Chrome'];
+        //settings.browsers = ['Chrome'];
         settings.singleRun = false;
+        settings.concurrency = Infinity;
     }
 
     config.set(settings);
