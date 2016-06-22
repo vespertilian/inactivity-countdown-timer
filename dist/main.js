@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["main"] = factory();
+	else
+		root["main"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -45,7 +55,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	// Fix logging for ie8 when dev tools are not open
 	(function () {
 	    if (typeof console == "undefined") {
 	        this.console = { log: function () { } };
@@ -53,29 +62,6 @@
 	})();
 	var inactivity_logout_1 = __webpack_require__(1);
 	exports.InactivityLogout = inactivity_logout_1.InactivityLogout;
-	if (false) {
-	    console.log('In development mode loading demo code');
-	    document.addEventListener("DOMContentLoaded", function (event) {
-	        function timeoutCallback() {
-	            console.log('timeout callback fired');
-	        }
-	        var updateElement = document.getElementById('timeRemaining');
-	        function countDownCallback(timeRemaining) {
-	            updateElement.innerHTML = (timeRemaining + ' seconds');
-	        }
-	        function countDownCancelledCallback() {
-	            updateElement.innerHTML = 'CountDown cancelled';
-	        }
-	        var settings = {
-	            idleTimeoutTime: 15000,
-	            startCountDownTimerAt: 10000,
-	            timeoutCallback: timeoutCallback,
-	            countDownCallback: countDownCallback,
-	            countDownCancelledCallback: countDownCancelledCallback
-	        };
-	        new inactivity_logout_1.InactivityLogout(settings);
-	    });
-	}
 
 
 /***/ },
@@ -88,7 +74,6 @@
 	    function InactivityLogout(params) {
 	        if (params === void 0) { params = {}; }
 	        this.lastResetTimeStamp = (new Date()).getTime();
-	        this.localStorage = null;
 	        this.countingDown = false;
 	        // config var defaults
 	        // how long you can be idle for before we time you out
@@ -102,25 +87,27 @@
 	                this.startCountDownTimerAt = params.startCountDownTimerAt;
 	            }
 	        }
-	        this.timeoutCallback = params.timeoutCallback || false;
-	        this.countDownCallback = params.countDownCallback || false;
-	        this.countDownCancelledCallback = params.countDownCancelledCallback || false;
+	        this.timeoutCallback = params.timeoutCallback;
+	        this.countDownCallback = params.countDownCallback;
+	        this.countDownCancelledCallback = params.countDownCancelledCallback;
 	        this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
-	        this.signOutHREF = params.logoutHREF || false;
+	        this.signOutHREF = params.logoutHREF;
 	        this.timeoutPrecision = params.timeoutPrecision || 1000;
 	        // setup local storage
 	        this.localStorage = this.detectAndAssignLocalStorage();
 	        this.start(this.timeoutPrecision);
+	        var Idocument = document;
+	        var Iwindow = window;
 	        // attach events that will rest the timers
 	        // this ends up calling the this.handleEvent function
 	        // see README.md for more on why we are passing this
-	        document.addEventListener('click', this, false);
-	        document.addEventListener('mousemove', this, false);
-	        document.addEventListener('keypress', this, false);
-	        window.addEventListener('load', this, false); // effectively a no-op
-	        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
+	        Idocument.addEventListener('click', this, false);
+	        Idocument.addEventListener('mousemove', this, false);
+	        Idocument.addEventListener('keypress', this, false);
+	        Iwindow.addEventListener('load', this, false); // effectively a no-op
+	        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
 	        // this fixes a bug in ie11 where the local storage does not sync
-	        window.addEventListener('storage', function (e) { }); // effectively a no-op
+	        Iwindow.addEventListener('storage', function () { }); // effectively a no-op
 	    }
 	    InactivityLogout.prototype.start = function (precision) {
 	        var _this = this;
@@ -134,17 +121,19 @@
 	        window.clearInterval(this.idleTimeoutID);
 	    };
 	    InactivityLogout.prototype.cleanup = function () {
-	        document.removeEventListener('click', this, false);
-	        document.removeEventListener('mousemove', this, false);
-	        document.removeEventListener('keypress', this, false);
-	        window.removeEventListener('load', this, false); // effectively a no-op
+	        var Idocument = document;
+	        var Iwindow = window;
+	        Idocument.removeEventListener('click', this, false);
+	        Idocument.removeEventListener('mousemove', this, false);
+	        Idocument.removeEventListener('keypress', this, false);
+	        Iwindow.removeEventListener('load', this, false); // effectively a no-op
 	        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
 	        // this fixes a bug in ie11 where the local storage does not sync
-	        window.removeEventListener('storage', function (e) { }); // effectively a no-op
+	        Iwindow.removeEventListener('storage', function () { }); // effectively a no-op
 	        this.stop();
 	    };
 	    // see readme about why we use handleEvent
-	    InactivityLogout.prototype.handleEvent = function (eventName) {
+	    InactivityLogout.prototype.handleEvent = function () {
 	        var currentTime = (new Date).getTime();
 	        this.setLastResetTimeStamp(currentTime);
 	    };
@@ -228,7 +217,7 @@
 	        }
 	    };
 	    InactivityLogout.prototype.detectAndAssignLocalStorage = function () {
-	        var uid = (new Date).getTime().toString() + 'detectAndAssignLocalStorage';
+	        var uid = (new Date()).getTime().toString() + 'detectAndAssignLocalStorage';
 	        var storage = localStorage;
 	        var result;
 	        try {
@@ -332,4 +321,6 @@
 	})();
 
 /***/ }
-/******/ ]);
+/******/ ])
+});
+;

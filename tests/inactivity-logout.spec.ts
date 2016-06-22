@@ -1,6 +1,6 @@
 require('./ie8forEachPolyfill');
 import {InactivityLogout} from '../src/inactivity-logout'
-import {IConfigParams} from '../src/inactivity-logout'
+import {IInactivityConfigParams} from '../src/inactivity-logout'
 // need to install jasmine clock and mock the date for testing
 describe('Inactivity logout -', () => {
 
@@ -70,7 +70,7 @@ describe('Inactivity logout -', () => {
             jasmine.clock().install();
             jasmine.clock().mockDate();
             let callback = jasmine.createSpy('callback');
-            let settings: IConfigParams = {
+            let settings: IInactivityConfigParams = {
                 idleTimeoutTime: 20000,
                 startCountDownTimerAt: 10000,
                 countDownCallback: callback
@@ -95,7 +95,7 @@ describe('Inactivity logout -', () => {
             jasmine.clock().mockDate();
             let countDownCallback = jasmine.createSpy('countDownCallback');
             let countDownCancelledCallback = jasmine.createSpy('countDownCancelledCallback');
-            let settings: IConfigParams = {
+            let settings: IInactivityConfigParams = {
                 idleTimeoutTime: 20000,
                 startCountDownTimerAt: 10000,
                 countDownCallback: countDownCallback,

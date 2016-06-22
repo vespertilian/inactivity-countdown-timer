@@ -1,4 +1,4 @@
-export interface IConfigParams {
+export interface IInactivityConfigParams {
     idleTimeoutTime?: number;
     timeoutPrecision?: number;
     startCountDownTimerAt?: number;
@@ -36,7 +36,7 @@ export class InactivityLogout {
     private idleTimeoutID: number;
     private currentTimerPrecision: number;
 
-    constructor(params: IConfigParams = {}) {
+    constructor(params: IInactivityConfigParams = {}) {
         // config var defaults
         // how long you can be idle for before we time you out
         this.idleTimeoutTime = params.idleTimeoutTime || 10000;

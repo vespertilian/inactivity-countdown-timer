@@ -6,7 +6,7 @@
 })();
 
 import {InactivityLogout} from './inactivity-logout'
-import {IConfigParams} from '../src/inactivity-logout'
+import {IInactivityConfigParams} from '../src/inactivity-logout'
 
 declare var ON_DEV: boolean;
 if(ON_DEV){
@@ -26,7 +26,7 @@ if(ON_DEV){
             updateElement.innerHTML = 'CountDown cancelled'
         }
 
-        let settings: IConfigParams = {
+        let settings: IInactivityConfigParams = {
             idleTimeoutTime: 15000,
             startCountDownTimerAt: 10000,
             timeoutCallback: timeoutCallback,
