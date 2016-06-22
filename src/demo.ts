@@ -29,6 +29,7 @@ if(ON_DEV){
         let settings: IInactivityConfigParams = {
             idleTimeoutTime: 15000,
             startCountDownTimerAt: 10000,
+            logoutHREF: '/logout.html',
             timeoutCallback: timeoutCallback,
             countDownCallback: countDownCallback,
             countDownCancelledCallback: countDownCancelledCallback
