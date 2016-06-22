@@ -29,7 +29,7 @@ if(process.env.NODE_ENV === 'distribution'){
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
     // export itself to a global umd
-    library: ['inactivity-logout'],
+    library: ['InactivityLogout'],
     libraryTarget: 'umd'
   };
   config.ts  = {

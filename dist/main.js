@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["main"] = factory();
+		exports["InactivityLogout"] = factory();
 	else
-		root["main"] = factory();
+		root["InactivityLogout"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
