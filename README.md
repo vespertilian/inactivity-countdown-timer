@@ -1,4 +1,38 @@
+# A vanilla JS library to automatically logout users after a specified time
 
+## Install 
+
+npm i @benefex/util-angular --save
+
+## Usage
+
+**Make sure you cleanup the object before deleting**
+
+```js
+// Optional config vars
+{
+    idleTimeoutTime?: number;
+    timeoutPrecision?: number;
+    startCountDownTimerAt?: number;
+    localStorageKey?: string;
+    timeoutCallback?(): void;
+    countDownCallback?(secondsLeft: number): void;
+    countDownCancelledCallback?(): void;
+    logoutHREF?: string;
+}
+
+// Instantiate new logout object
+let IL = new InactivityLogout(settings);
+
+// make sure you cleanup the object when you are finished using it.
+// will not be garbage collected unless you clean it up because of the timers
+IL.cleanup(()
+
+```
+
+## How we deal with the context of `this` when attaching an event listener
+
+It's not easy to set the context of this when you need to support IE8 because you cannot use .bind. So we have to use the handleEvent work around described on MDN
 
 ```js
 export class InactivityLogout {
@@ -52,5 +86,36 @@ var Something = function(element) {
   element.removeEventListener('dblclick', this, false);
 }
 ```
+## Supports
+
+ - IE8+
+ - Chrome
+ - Firefox
+ - Safari
+
+## Development
+
+The project is setup with both main.ts used for exporting the library and a demo.ts used to demo components and setup testing.
+
+### Installing
+`npm install` installs node modules and runs tests
+
+### NPM Tasks
+`npm start` runs a development server
+`npm test` runs the tests via karma (from the main ts file) 
+`npm build` builds a version for distribution via npm
+`npm prepublish` used when publishing to npm
+
+### Publishing workflow
+1. Run tests `npm test`
+2. Run build and check that your module was built (needs to be exported via main.ts)
+3. Install it into your project to test before publishing by running `npm install '/path-to-this/'`
+4. Bump version in package.json following [Semantic Versioning] SemVer
+5. Tag the release commit in git: `git tag -a v0.1.5 -m "Published v0.1.5"`
+6. Push the tags up to github: `git push origin --tags`
+7. Publish `npm publish`
+  
+[Semantic Versioning]: http://semver.org/
+
 
 [EventTarget.addEventListener()]: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
