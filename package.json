@@ -6,7 +6,7 @@
   "typings": "dist/main.d.ts",
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
-    "saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
+    "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
     "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base src/ --host 0.0.0.0",
     "build": "cross-env NODE_ENV=distribution webpack",
     "prepublish": "cross-env npm run build"

@@ -2,7 +2,8 @@ var webpackConfig = require('./webpack.config');
 var fs = require('fs');
 module.exports = function(config) {
 
-    if (!process.env.SAUCE_USERNAME) {
+    var saucelabs = process.env.SAUCELABS === 'true';
+    if (saucelabs && !process.env.SAUCE_USERNAME) {
         if (!fs.existsSync('sauce.json')) {
             console.log('Create a sauce.json with your credentials based on the sauce-sample.json file.');
             process.exit(1);
@@ -94,7 +95,6 @@ module.exports = function(config) {
                 dns: '8.8.8.8'
             }
         },
-        reporters: ["dots", "saucelabs"],
         specReporter: {
             maxLogLines: 5, // limit number of lines logged per test
             suppressErrorSummary: true, // do not print error summary
@@ -105,13 +105,15 @@ module.exports = function(config) {
         }
     };
 
-    if(process.env.SAUCELABS === 'true'){
+    if(saucelabs){
+        settings.reporters = ['dots', 'saucelabs'];
         settings.captureTimeout = 120000;
         settings.customLaunchers = customLaunchers;
         settings.browsers = Object.keys(customLaunchers);
         settings.singleRun = true;
         settings.concurrency = 3;
     } else {
+        settings.reporters = ['spec']; // Add spec reporter for local testing
         settings.browsers = ['Chrome'];
         settings.singleRun = false;
         settings.concurrency = Infinity;
