@@ -1,6 +1,6 @@
 {
   "name": "@benefex/inactivity-logout",
-  "version": "0.2.0",
+  "version": "1.0.0-beta-0",
   "description": "A vanilla JS library to automatically logout users after a specified time",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
@@ -9,9 +9,11 @@
     "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
     "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base src/ --host 0.0.0.0",
     "build": "cross-env NODE_ENV=distribution webpack",
+    "document": "cross-env npm run typedoc -- --out ./docs src/inactivity-logout.ts --theme minimal --mode modules",
     "prepublish": "cross-env npm run build",
+    "postinstall": "cross-env npm run typings install",
     "typings": "typings",
-    "postinstall": "cross-env npm run typings install"
+    "typedoc": "typedoc"
   },
   "author": "",
   "license": "MIT",
@@ -27,7 +29,7 @@
     "karma-webpack": "1.7.0",
     "ts-loader": "0.8.1",
     "tslint": "3.11.0",
-    "typedoc-webpack-plugin": "^1.0.9",
+    "typedoc": "0.4.5",
     "typescript": "1.8.10",
     "typings": "1.3.3",
     "webpack": "1.13.1",

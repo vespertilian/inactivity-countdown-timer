@@ -5,12 +5,10 @@
     "declaration": true
   },
   "exclude": [
-    "node_modules",
-    "typings/main",
-    "typings/main.d.ts"
+    "node_modules"
   ],
   "include": [
-    "typings/browser",
-    "typings/browser.d.ts"
+    "typings/globals",
+    "typings/index.d.ts"
   ]
 }

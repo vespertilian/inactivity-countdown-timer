@@ -1,6 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
-var TypedocWebpackPlugin = require('typedoc-webpack-plugin');
+
 var config = {
   context: path.resolve(__dirname, 'src'),
   entry: {demo: './demo.ts'},
@@ -21,10 +21,6 @@ var config = {
     ]
   }
 };
-
-if(process.env.NODE_ENV !== 'dev'){
-  config.plugins.push(new TypedocWebpackPlugin({}))
-}
 
 if(process.env.NODE_ENV === 'distribution'){
   console.log('building dist');
