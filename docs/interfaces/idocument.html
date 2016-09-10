@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>@benefex/inactivity-logout | @benefex/inactivity-logout</title>
+	<title>IDocument | @benefex/inactivity-logout</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<style type="text/css">/*! normalize.css v1.1.3 | MIT License | git.io/normalize */
@@ -909,118 +909,113 @@ img { max-width: 100%; }
 </header>
 <nav class="tsd-navigation secondary">
 	<ul>
+		<li class=" tsd-kind-class">
+			<a href="../classes/inactivitylogout.html" class="tsd-kind-icon">Inactivity<wbr>Logout</a>
+		</li>
+		<li class="current tsd-kind-interface tsd-is-not-exported">
+			<a href="idocument.html" class="tsd-kind-icon">IDocument</a>
+			<ul>
+				<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported">
+					<a href="idocument.html#addeventlistener" class="tsd-kind-icon">add<wbr>Event<wbr>Listener</a>
+				</li>
+				<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported">
+					<a href="idocument.html#removeeventlistener" class="tsd-kind-icon">remove<wbr>Event<wbr>Listener</a>
+				</li>
+			</ul>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="iinactivityconfigparams.html" class="tsd-kind-icon">IInactivity<wbr>Config<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-not-exported">
+			<a href="iwindow.html" class="tsd-kind-icon">IWindow</a>
+		</li>
 	</ul>
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
 		<div class="tsd-panel tsd-typography">
-			<h1 id="a-vanilla-js-library-to-automatically-logout-users-after-a-specified-time">A vanilla JS library to automatically logout users after a specified time</h1>
-			<h2 id="install">Install</h2>
-			<p>npm i @benefex/util-angular --save</p>
-			<h2 id="usage">Usage</h2>
-			<p><strong>Make sure you cleanup the object before deleting</strong></p>
-			<pre><code class="lang-js"><span class="hljs-comment">// Optional config vars</span>
-{
-    idleTimeoutTime?: number;
-    timeoutPrecision?: number;
-    startCountDownTimerAt?: number;
-    localStorageKey?: string;
-    timeoutCallback?(): <span class="hljs-keyword">void</span>;
-    countDownCallback?(secondsLeft: number): <span class="hljs-keyword">void</span>;
-    countDownCancelledCallback?(): <span class="hljs-keyword">void</span>;
-    logoutHREF?: string;
-}
-
-<span class="hljs-comment">// Instantiate new logout object</span>
-<span class="hljs-keyword">let</span> IL = <span class="hljs-keyword">new</span> InactivityLogout(settings);
-
-<span class="hljs-comment">// make sure you cleanup the object when you are finished using it.</span>
-<span class="hljs-comment">// will not be garbage collected unless you clean it up because of the timers</span>
-IL.cleanup(()
-</code></pre>
-			<h2 id="how-we-deal-with-the-context-of-this-when-attaching-an-event-listener">How we deal with the context of <code>this</code> when attaching an event listener</h2>
-			<p>It&#39;s not easy to set the context of this when you need to support IE8 because you cannot use .bind. So we have to use the handleEvent work around described on MDN</p>
-			<pre><code class="lang-js"><span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InactivityLogout</span> </span>{
-        <span class="hljs-keyword">constructor</span>(){
-            <span class="hljs-comment">// we pass in the value this not a function </span>
-            <span class="hljs-comment">// this.handleEvent is called (i.e the handleEvent function on the class)</span>
-            <span class="hljs-keyword">this</span>.attachEvent(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>);
-        }
-
-        handleEvent(eventName: string): <span class="hljs-keyword">void</span> {
-            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'**** clear timeout for event'</span>, eventName);
-            <span class="hljs-built_in">window</span>.clearTimeout(<span class="hljs-keyword">this</span>.idleTimeoutID);
-            <span class="hljs-keyword">this</span>.startTimers();
-        }
-}
-</code></pre>
-			<h3 id="from-mdn-dealing-with-handling-the-attached-eventlistners">From MDN dealing with handling the attached EventListners</h3>
-			<p>Read more about <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener">EventTarget.addEventListener()</a> on MDN</p>
-			<h5 id="the-value-of-this-within-the-handler">The value of <strong>this</strong> within the handler</h5>
-			<p>It is often desirable to reference the element on which the event handler was fired, such as when using a generic handler for a set of similar elements.</p>
-			<p>When attaching a handler function to an element using addEventListener(), the value of this inside the handler is a reference to the element. It is the same as the value of the currentTarget property of the event argument that is passed to the handler.</p>
-			<p>A solution is using a special function called handleEvent to catch any events:</p>
-			<pre><code class="lang-js"><span class="hljs-keyword">var</span> Something = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">element</span>) </span>{
-  <span class="hljs-keyword">this</span>.name = <span class="hljs-string">'Something Good'</span>;
-  <span class="hljs-keyword">this</span>.handleEvent = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>) </span>{
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span>.name); <span class="hljs-comment">// 'Something Good', as this is the Something object</span>
-    <span class="hljs-keyword">switch</span>(event.type) {
-      <span class="hljs-keyword">case</span> <span class="hljs-string">'click'</span>:
-        <span class="hljs-comment">// some code here...</span>
-        <span class="hljs-keyword">break</span>;
-      <span class="hljs-keyword">case</span> <span class="hljs-string">'dblclick'</span>:
-        <span class="hljs-comment">// some code here...</span>
-        <span class="hljs-keyword">break</span>;
-    }
-  };
-
-  <span class="hljs-comment">// Note that the listeners in this case are this, not this.handleEvent</span>
-  element.addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-  element.addEventListener(<span class="hljs-string">'dblclick'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-
-  <span class="hljs-comment">// You can properly remove the listeners</span>
-  element.removeEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-  element.removeEventListener(<span class="hljs-string">'dblclick'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-}
-</code></pre>
-			<h2 id="supports">Supports</h2>
-			<ul>
-				<li>IE8+</li>
-				<li>Chrome</li>
-				<li>Firefox</li>
-				<li>Safari</li>
-			</ul>
-			<h2 id="development">Development</h2>
-			<p>The project is setup with both main.ts used for exporting the library and a demo.ts used to demo components and setup testing.</p>
-			<h3 id="installing">Installing</h3>
-			<p><code>npm install</code> installs node modules and runs tests</p>
-			<h3 id="npm-tasks">NPM Tasks</h3>
-			<p><code>npm start</code> runs a development server
-				<code>npm test</code> runs the tests via karma (from the main ts file)
-				<code>npm build</code> builds a version for distribution via npm
-			<code>npm prepublish</code> used when publishing to npm</p>
-			<h3 id="publishing-workflow">Publishing workflow</h3>
-			<ol>
-				<li>Run tests <code>npm test</code></li>
-				<li>Run build and check that your module was built (needs to be exported via main.ts)</li>
-				<li>Install it into your project to test before publishing by running <code>npm install &#39;/path-to-this/&#39;</code></li>
-				<li>Bump version in package.json following <a href="http://semver.org/">Semantic Versioning</a> SemVer</li>
-				<li>Tag the release commit in git: <code>git tag -a v0.1.5 -m &quot;Published v0.1.5&quot;</code></li>
-				<li>Push the tags up to github: <code>git push origin --tags</code></li>
-				<li>Publish <code>npm publish</code></li>
-			</ol>
 		</div>
+		<section class="tsd-panel tsd-hierarchy">
+			<h3>Hierarchy</h3>
+			<ul class="tsd-hierarchy">
+				<li>
+					<span class="target">IDocument</span>
+				</li>
+			</ul>
+		</section>
 		<section class="tsd-panel-group tsd-index-group">
 			<h2>Index</h2>
 			<section class="tsd-panel tsd-index-panel">
 				<div class="tsd-index-content">
-					<section class="tsd-index-section ">
-						<h3>External modules</h3>
+					<section class="tsd-index-section tsd-is-not-exported">
+						<h3>Methods</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-external-module"><a href="modules/_inactivity_logout_.html" class="tsd-kind-icon">"inactivity-<wbr>logout"</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported"><a href="idocument.html#addeventlistener" class="tsd-kind-icon">add<wbr>Event<wbr>Listener</a></li>
+							<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported"><a href="idocument.html#removeeventlistener" class="tsd-kind-icon">remove<wbr>Event<wbr>Listener</a></li>
 						</ul>
 					</section>
 				</div>
+			</section>
+		</section>
+		<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
+			<h2>Methods</h2>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported">
+				<a name="addeventlistener" class="tsd-anchor"></a>
+				<h3>add<wbr>Event<wbr>Listener</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported">
+					<li class="tsd-signature tsd-kind-icon">add<wbr>Event<wbr>Listener<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, useCapture<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L18">inactivity-logout.ts:18</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>type: <span class="tsd-signature-type">string</span></h5>
+							</li>
+							<li>
+								<h5>listener: <span class="tsd-signature-type">any</span></h5>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> useCapture: <span class="tsd-signature-type">boolean</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported">
+				<a name="removeeventlistener" class="tsd-anchor"></a>
+				<h3>remove<wbr>Event<wbr>Listener</h3>
+				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-not-exported">
+					<li class="tsd-signature tsd-kind-icon">remove<wbr>Event<wbr>Listener<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, listener<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, useCapture<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+				</ul>
+				<ul class="tsd-descriptions">
+					<li class="tsd-description">
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L19">inactivity-logout.ts:19</a></li>
+							</ul>
+						</aside>
+						<h4 class="tsd-parameters-title">Parameters</h4>
+						<ul class="tsd-parameters">
+							<li>
+								<h5>type: <span class="tsd-signature-type">string</span></h5>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> listener: <span class="tsd-signature-type">any</span></h5>
+							</li>
+							<li>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> useCapture: <span class="tsd-signature-type">boolean</span></h5>
+							</li>
+						</ul>
+						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+					</li>
+				</ul>
 			</section>
 		</section>
 		<footer class="with-border-bottom">

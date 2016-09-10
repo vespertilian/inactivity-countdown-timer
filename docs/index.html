@@ -909,116 +909,40 @@ img { max-width: 100%; }
 </header>
 <nav class="tsd-navigation secondary">
 	<ul>
+		<li class=" tsd-kind-class">
+			<a href="classes/inactivitylogout.html" class="tsd-kind-icon">Inactivity<wbr>Logout</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-not-exported">
+			<a href="interfaces/idocument.html" class="tsd-kind-icon">IDocument</a>
+		</li>
+		<li class=" tsd-kind-interface">
+			<a href="interfaces/iinactivityconfigparams.html" class="tsd-kind-icon">IInactivity<wbr>Config<wbr>Params</a>
+		</li>
+		<li class=" tsd-kind-interface tsd-is-not-exported">
+			<a href="interfaces/iwindow.html" class="tsd-kind-icon">IWindow</a>
+		</li>
 	</ul>
 </nav>
 <div class="container container-main">
 	<div class="content-wrap">
 		<div class="tsd-panel tsd-typography">
-			<h1 id="a-vanilla-js-library-to-automatically-logout-users-after-a-specified-time">A vanilla JS library to automatically logout users after a specified time</h1>
-			<h2 id="install">Install</h2>
-			<p>npm i @benefex/util-angular --save</p>
-			<h2 id="usage">Usage</h2>
-			<p><strong>Make sure you cleanup the object before deleting</strong></p>
-			<pre><code class="lang-js"><span class="hljs-comment">// Optional config vars</span>
-{
-    idleTimeoutTime?: number;
-    timeoutPrecision?: number;
-    startCountDownTimerAt?: number;
-    localStorageKey?: string;
-    timeoutCallback?(): <span class="hljs-keyword">void</span>;
-    countDownCallback?(secondsLeft: number): <span class="hljs-keyword">void</span>;
-    countDownCancelledCallback?(): <span class="hljs-keyword">void</span>;
-    logoutHREF?: string;
-}
-
-<span class="hljs-comment">// Instantiate new logout object</span>
-<span class="hljs-keyword">let</span> IL = <span class="hljs-keyword">new</span> InactivityLogout(settings);
-
-<span class="hljs-comment">// make sure you cleanup the object when you are finished using it.</span>
-<span class="hljs-comment">// will not be garbage collected unless you clean it up because of the timers</span>
-IL.cleanup(()
-</code></pre>
-			<h2 id="how-we-deal-with-the-context-of-this-when-attaching-an-event-listener">How we deal with the context of <code>this</code> when attaching an event listener</h2>
-			<p>It&#39;s not easy to set the context of this when you need to support IE8 because you cannot use .bind. So we have to use the handleEvent work around described on MDN</p>
-			<pre><code class="lang-js"><span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InactivityLogout</span> </span>{
-        <span class="hljs-keyword">constructor</span>(){
-            <span class="hljs-comment">// we pass in the value this not a function </span>
-            <span class="hljs-comment">// this.handleEvent is called (i.e the handleEvent function on the class)</span>
-            <span class="hljs-keyword">this</span>.attachEvent(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>);
-        }
-
-        handleEvent(eventName: string): <span class="hljs-keyword">void</span> {
-            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'**** clear timeout for event'</span>, eventName);
-            <span class="hljs-built_in">window</span>.clearTimeout(<span class="hljs-keyword">this</span>.idleTimeoutID);
-            <span class="hljs-keyword">this</span>.startTimers();
-        }
-}
-</code></pre>
-			<h3 id="from-mdn-dealing-with-handling-the-attached-eventlistners">From MDN dealing with handling the attached EventListners</h3>
-			<p>Read more about <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener">EventTarget.addEventListener()</a> on MDN</p>
-			<h5 id="the-value-of-this-within-the-handler">The value of <strong>this</strong> within the handler</h5>
-			<p>It is often desirable to reference the element on which the event handler was fired, such as when using a generic handler for a set of similar elements.</p>
-			<p>When attaching a handler function to an element using addEventListener(), the value of this inside the handler is a reference to the element. It is the same as the value of the currentTarget property of the event argument that is passed to the handler.</p>
-			<p>A solution is using a special function called handleEvent to catch any events:</p>
-			<pre><code class="lang-js"><span class="hljs-keyword">var</span> Something = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">element</span>) </span>{
-  <span class="hljs-keyword">this</span>.name = <span class="hljs-string">'Something Good'</span>;
-  <span class="hljs-keyword">this</span>.handleEvent = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>) </span>{
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span>.name); <span class="hljs-comment">// 'Something Good', as this is the Something object</span>
-    <span class="hljs-keyword">switch</span>(event.type) {
-      <span class="hljs-keyword">case</span> <span class="hljs-string">'click'</span>:
-        <span class="hljs-comment">// some code here...</span>
-        <span class="hljs-keyword">break</span>;
-      <span class="hljs-keyword">case</span> <span class="hljs-string">'dblclick'</span>:
-        <span class="hljs-comment">// some code here...</span>
-        <span class="hljs-keyword">break</span>;
-    }
-  };
-
-  <span class="hljs-comment">// Note that the listeners in this case are this, not this.handleEvent</span>
-  element.addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-  element.addEventListener(<span class="hljs-string">'dblclick'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-
-  <span class="hljs-comment">// You can properly remove the listeners</span>
-  element.removeEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-  element.removeEventListener(<span class="hljs-string">'dblclick'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
-}
-</code></pre>
-			<h2 id="supports">Supports</h2>
-			<ul>
-				<li>IE8+</li>
-				<li>Chrome</li>
-				<li>Firefox</li>
-				<li>Safari</li>
-			</ul>
-			<h2 id="development">Development</h2>
-			<p>The project is setup with both main.ts used for exporting the library and a demo.ts used to demo components and setup testing.</p>
-			<h3 id="installing">Installing</h3>
-			<p><code>npm install</code> installs node modules and runs tests</p>
-			<h3 id="npm-tasks">NPM Tasks</h3>
-			<p><code>npm start</code> runs a development server
-				<code>npm test</code> runs the tests via karma (from the main ts file)
-				<code>npm build</code> builds a version for distribution via npm
-			<code>npm prepublish</code> used when publishing to npm</p>
-			<h3 id="publishing-workflow">Publishing workflow</h3>
-			<ol>
-				<li>Run tests <code>npm test</code></li>
-				<li>Run build and check that your module was built (needs to be exported via main.ts)</li>
-				<li>Install it into your project to test before publishing by running <code>npm install &#39;/path-to-this/&#39;</code></li>
-				<li>Bump version in package.json following <a href="http://semver.org/">Semantic Versioning</a> SemVer</li>
-				<li>Tag the release commit in git: <code>git tag -a v0.1.5 -m &quot;Published v0.1.5&quot;</code></li>
-				<li>Push the tags up to github: <code>git push origin --tags</code></li>
-				<li>Publish <code>npm publish</code></li>
-			</ol>
 		</div>
-		<div style="position:relative;"><a name="typedoc-main-index" class="tsd-anchor"></a></div>
 		<section class="tsd-panel-group tsd-index-group">
 			<h2>Index</h2>
 			<section class="tsd-panel tsd-index-panel">
 				<div class="tsd-index-content">
 					<section class="tsd-index-section ">
-						<h3>External modules</h3>
+						<h3>Classes</h3>
 						<ul class="tsd-index-list">
-							<li class="tsd-kind-external-module"><a href="modules/_inactivity_logout_.html" class="tsd-kind-icon">"inactivity-<wbr>logout"</a></li>
+							<li class="tsd-kind-class"><a href="classes/inactivitylogout.html" class="tsd-kind-icon">Inactivity<wbr>Logout</a></li>
+						</ul>
+					</section>
+					<section class="tsd-index-section ">
+						<h3>Interfaces</h3>
+						<ul class="tsd-index-list">
+							<li class="tsd-kind-interface tsd-is-not-exported"><a href="interfaces/idocument.html" class="tsd-kind-icon">IDocument</a></li>
+							<li class="tsd-kind-interface"><a href="interfaces/iinactivityconfigparams.html" class="tsd-kind-icon">IInactivity<wbr>Config<wbr>Params</a></li>
+							<li class="tsd-kind-interface tsd-is-not-exported"><a href="interfaces/iwindow.html" class="tsd-kind-icon">IWindow</a></li>
 						</ul>
 					</section>
 				</div>

@@ -9,7 +9,7 @@
     "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
     "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base src/ --host 0.0.0.0",
     "build": "cross-env NODE_ENV=distribution webpack",
-    "document": "cross-env npm run typedoc -- --out ./docs src/inactivity-logout.ts --theme minimal --mode modules",
+    "document": "cross-env npm run typedoc -- --out ./docs src/inactivity-logout.ts --theme minimal --mode file --readme none",
     "prepublish": "cross-env npm run build",
     "postinstall": "cross-env npm run typings install",
     "typings": "typings",
