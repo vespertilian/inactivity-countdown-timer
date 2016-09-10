@@ -55,6 +55,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	// fix ie8 console error
 	(function () {
 	    if (typeof console == "undefined") {
 	        this.console = { log: function () { } };

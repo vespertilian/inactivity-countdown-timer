@@ -9,7 +9,9 @@
     "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
     "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base src/ --host 0.0.0.0",
     "build": "cross-env NODE_ENV=distribution webpack",
-    "prepublish": "cross-env npm run build"
+    "prepublish": "cross-env npm run build",
+    "typings": "typings",
+    "postinstall": "cross-env npm run typings install"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE",
@@ -25,8 +27,9 @@
     "karma-webpack": "1.7.0",
     "ts-loader": "0.8.1",
     "tslint": "3.11.0",
+    "typedoc-webpack-plugin": "^1.0.9",
     "typescript": "1.8.10",
-    "typings": "1.1.0",
+    "typings": "1.3.3",
     "webpack": "1.13.1",
     "webpack-dev-server": "1.14.1"
   }

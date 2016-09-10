@@ -1,0 +1,256 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@benefex/inactivity-logout</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script src="assets/js/modernizr.js"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@benefex/inactivity-logout</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> @benefex/inactivity-logout</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="a-vanilla-js-library-to-automatically-logout-users-after-a-specified-time">A vanilla JS library to automatically logout users after a specified time</h1>
+				<h2 id="install">Install</h2>
+				<p>npm i @benefex/util-angular --save</p>
+				<h2 id="usage">Usage</h2>
+				<p><strong>Make sure you cleanup the object before deleting</strong></p>
+				<pre><code class="lang-js"><span class="hljs-comment">// Optional config vars</span>
+{
+    idleTimeoutTime?: number;
+    timeoutPrecision?: number;
+    startCountDownTimerAt?: number;
+    localStorageKey?: string;
+    timeoutCallback?(): <span class="hljs-keyword">void</span>;
+    countDownCallback?(secondsLeft: number): <span class="hljs-keyword">void</span>;
+    countDownCancelledCallback?(): <span class="hljs-keyword">void</span>;
+    logoutHREF?: string;
+}
+
+<span class="hljs-comment">// Instantiate new logout object</span>
+<span class="hljs-keyword">let</span> IL = <span class="hljs-keyword">new</span> InactivityLogout(settings);
+
+<span class="hljs-comment">// make sure you cleanup the object when you are finished using it.</span>
+<span class="hljs-comment">// will not be garbage collected unless you clean it up because of the timers</span>
+IL.cleanup(()
+</code></pre>
+				<h2 id="how-we-deal-with-the-context-of-this-when-attaching-an-event-listener">How we deal with the context of <code>this</code> when attaching an event listener</h2>
+				<p>It&#39;s not easy to set the context of this when you need to support IE8 because you cannot use .bind. So we have to use the handleEvent work around described on MDN</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InactivityLogout</span> </span>{
+        <span class="hljs-keyword">constructor</span>(){
+            <span class="hljs-comment">// we pass in the value this not a function </span>
+            <span class="hljs-comment">// this.handleEvent is called (i.e the handleEvent function on the class)</span>
+            <span class="hljs-keyword">this</span>.attachEvent(<span class="hljs-built_in">document</span>, <span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>);
+        }
+
+        handleEvent(eventName: string): <span class="hljs-keyword">void</span> {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'**** clear timeout for event'</span>, eventName);
+            <span class="hljs-built_in">window</span>.clearTimeout(<span class="hljs-keyword">this</span>.idleTimeoutID);
+            <span class="hljs-keyword">this</span>.startTimers();
+        }
+}
+</code></pre>
+				<h3 id="from-mdn-dealing-with-handling-the-attached-eventlistners">From MDN dealing with handling the attached EventListners</h3>
+				<p>Read more about <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener">EventTarget.addEventListener()</a> on MDN</p>
+				<h5 id="the-value-of-this-within-the-handler">The value of <strong>this</strong> within the handler</h5>
+				<p>It is often desirable to reference the element on which the event handler was fired, such as when using a generic handler for a set of similar elements.</p>
+				<p>When attaching a handler function to an element using addEventListener(), the value of this inside the handler is a reference to the element. It is the same as the value of the currentTarget property of the event argument that is passed to the handler.</p>
+				<p>A solution is using a special function called handleEvent to catch any events:</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">var</span> Something = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">element</span>) </span>{
+  <span class="hljs-keyword">this</span>.name = <span class="hljs-string">'Something Good'</span>;
+  <span class="hljs-keyword">this</span>.handleEvent = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">event</span>) </span>{
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">this</span>.name); <span class="hljs-comment">// 'Something Good', as this is the Something object</span>
+    <span class="hljs-keyword">switch</span>(event.type) {
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'click'</span>:
+        <span class="hljs-comment">// some code here...</span>
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'dblclick'</span>:
+        <span class="hljs-comment">// some code here...</span>
+        <span class="hljs-keyword">break</span>;
+    }
+  };
+
+  <span class="hljs-comment">// Note that the listeners in this case are this, not this.handleEvent</span>
+  element.addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
+  element.addEventListener(<span class="hljs-string">'dblclick'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
+
+  <span class="hljs-comment">// You can properly remove the listeners</span>
+  element.removeEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
+  element.removeEventListener(<span class="hljs-string">'dblclick'</span>, <span class="hljs-keyword">this</span>, <span class="hljs-literal">false</span>);
+}
+</code></pre>
+				<h2 id="supports">Supports</h2>
+				<ul>
+					<li>IE8+</li>
+					<li>Chrome</li>
+					<li>Firefox</li>
+					<li>Safari</li>
+				</ul>
+				<h2 id="development">Development</h2>
+				<p>The project is setup with both main.ts used for exporting the library and a demo.ts used to demo components and setup testing.</p>
+				<h3 id="installing">Installing</h3>
+				<p><code>npm install</code> installs node modules and runs tests</p>
+				<h3 id="npm-tasks">NPM Tasks</h3>
+				<p><code>npm start</code> runs a development server
+					<code>npm test</code> runs the tests via karma (from the main ts file)
+					<code>npm build</code> builds a version for distribution via npm
+				<code>npm prepublish</code> used when publishing to npm</p>
+				<h3 id="publishing-workflow">Publishing workflow</h3>
+				<ol>
+					<li>Run tests <code>npm test</code></li>
+					<li>Run build and check that your module was built (needs to be exported via main.ts)</li>
+					<li>Install it into your project to test before publishing by running <code>npm install &#39;/path-to-this/&#39;</code></li>
+					<li>Bump version in package.json following <a href="http://semver.org/">Semantic Versioning</a> SemVer</li>
+					<li>Tag the release commit in git: <code>git tag -a v0.1.5 -m &quot;Published v0.1.5&quot;</code></li>
+					<li>Push the tags up to github: <code>git push origin --tags</code></li>
+					<li>Publish <code>npm publish</code></li>
+				</ol>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_demo_.html">"src/demo"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_inactivity_logout_.html">"src/inactivity-<wbr>logout"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_main_.html">"src/main"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_tests_inactivity_logout_spec_.html">"tests/inactivity-<wbr>logout.spec"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.io" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

@@ -4,3 +4,4 @@ typings/
 sauce.json
 npm-debug.log
 sc_karma*
+.DS_Store

@@ -1,11 +1,11 @@
 var path = require('path');
 var webpack = require('webpack');
-
+var TypedocWebpackPlugin = require('typedoc-webpack-plugin');
 var config = {
   context: path.resolve(__dirname, 'src'),
   entry: {demo: './demo.ts'},
   output: {
-    path: path.resolve(__dirname, 'src'),
+    path: path.resolve(__dirname, 'dev'),
     filename: '[name].js'
   },
   plugins: [
@@ -22,6 +22,10 @@ var config = {
   }
 };
 
+if(process.env.NODE_ENV !== 'dev'){
+  config.plugins.push(new TypedocWebpackPlugin({}))
+}
+
 if(process.env.NODE_ENV === 'distribution'){
   console.log('building dist');
   config.entry = { app:'./main.ts' };
@@ -32,17 +36,6 @@ if(process.env.NODE_ENV === 'distribution'){
     library: ['InactivityLogout'],
     libraryTarget: 'umd'
   };
-  config.ts  = {
-    compilerOptions: {
-      module: "commonjs",
-      target: "es5",
-      experimentalDecorators: true,
-      emitDecoratorMetadata: true,
-      declaration: true,
-      sourceMap: true,
-      noImplicitAny: true
-    }
-  }
 }
 
 module.exports = config;
