@@ -5,7 +5,7 @@ var config = {
   context: path.resolve(__dirname, 'src'),
   entry: {demo: './demo.ts'},
   output: {
-    path: path.resolve(__dirname, 'src'),
+    path: path.resolve(__dirname, 'dev'),
     filename: '[name].js'
   },
   plugins: [
@@ -32,17 +32,6 @@ if(process.env.NODE_ENV === 'distribution'){
     library: ['InactivityLogout'],
     libraryTarget: 'umd'
   };
-  config.ts  = {
-    compilerOptions: {
-      module: "commonjs",
-      target: "es5",
-      experimentalDecorators: true,
-      emitDecoratorMetadata: true,
-      declaration: true,
-      sourceMap: true,
-      noImplicitAny: true
-    }
-  }
 }
 
 module.exports = config;
