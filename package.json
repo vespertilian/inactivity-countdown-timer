@@ -14,7 +14,7 @@
     "postinstall": "cross-env npm run typings install"
   },
   "author": "",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "cross-env": "1.0.8",
