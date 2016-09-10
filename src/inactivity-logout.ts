@@ -19,7 +19,7 @@ interface IDocument {
     removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
 }
 
-require('./ie8addEventListener');
+// require('./ie8addEventListener');
 export class InactivityLogout {
     private idleTimeoutTime: number;
     private timeoutPrecision: number;
