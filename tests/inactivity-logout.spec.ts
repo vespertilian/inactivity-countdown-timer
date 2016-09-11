@@ -1,4 +1,4 @@
-require('./ie8forEachPolyfill');
+require('./ie8forEachPolyfill'); // because we use forEach in this test
 import {InactivityLogout} from '../src/inactivity-logout'
 import {IInactivityConfigParams} from '../src/inactivity-logout'
 // need to install jasmine clock and mock the date for testing

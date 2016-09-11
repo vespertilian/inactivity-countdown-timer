@@ -9,15 +9,20 @@ export interface IInactivityConfigParams {
     logoutHREF?: string;
 }
 
-interface IWindow {
+interface IWindow extends Window {
     addEventListener(type: string, listener: any, useCapture?: boolean): void;
     removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
 }
 
-interface IDocument {
+declare var window: IWindow;
+
+interface IDocument extends Document {
     addEventListener(type: string, listener: any, useCapture?: boolean): void;
     removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
 }
+
+declare var document: IDocument;
+
 
 // require('./ie8addEventListener');
 export class InactivityLogout {
@@ -36,7 +41,7 @@ export class InactivityLogout {
     private idleTimeoutID: number;
     private currentTimerPrecision: number;
 
-    constructor(params: IInactivityConfigParams = {}) {
+    constructor(private params: IInactivityConfigParams = {}) {
         // config var defaults
         // how long you can be idle for before we time you out
         this.idleTimeoutTime = params.idleTimeoutTime || 10000;
@@ -61,18 +66,16 @@ export class InactivityLogout {
 
         this.start(this.timeoutPrecision);
 
-        let Idocument: IDocument = document;
-        let Iwindow: IWindow = window;
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
         // see README.md for more on why we are passing this
-        Idocument.addEventListener('click', this, false);
-        Idocument.addEventListener('mousemove', this, false);
-        Idocument.addEventListener('keypress', this, false);
-        Iwindow.addEventListener('load', this, false); // effectively a no-op
+        document.addEventListener('click', this, false);
+        document.addEventListener('mousemove', this, false);
+        document.addEventListener('keypress', this, false);
+        window.addEventListener('load', this, false); // effectively a no-op
         // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         // this fixes a bug in ie11 where the local storage does not sync
-        Iwindow.addEventListener('storage', function() {}); // effectively a no-op
+        window.addEventListener('storage', function() {}); // effectively a no-op
     }
 
     public start(precision: number): void {
@@ -88,16 +91,14 @@ export class InactivityLogout {
     }
 
     public cleanup(): void {
-        let Idocument: IDocument = document;
-        let Iwindow: IWindow = window;
-        Idocument.removeEventListener('click', this, false);
-        Idocument.removeEventListener('mousemove', this, false);
-        Idocument.removeEventListener('keypress', this, false);
-        Iwindow.removeEventListener('load', this, false); // effectively a no-op
+        document.removeEventListener('click', this, false);
+        document.removeEventListener('mousemove', this, false);
+        document.removeEventListener('keypress', this, false);
+        window.removeEventListener('load', this, false); // effectively a no-op
 
         //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         // this fixes a bug in ie11 where the local storage does not sync
-        Iwindow.removeEventListener('storage', function() {}); // effectively a no-op
+        window.removeEventListener('storage', function() {}); // effectively a no-op
         this.stop();
     }
 
