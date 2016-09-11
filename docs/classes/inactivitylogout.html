@@ -943,6 +943,9 @@ img { max-width: 100%; }
 					<a href="inactivitylogout.html#localstoragekey" class="tsd-kind-icon">local<wbr>Storage<wbr>Key</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a href="inactivitylogout.html#params" class="tsd-kind-icon">params</a>
+				</li>
+				<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a href="inactivitylogout.html#signouthref" class="tsd-kind-icon">sign<wbr>OutHREF</a>
 				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
@@ -992,14 +995,8 @@ img { max-width: 100%; }
 				</li>
 			</ul>
 		</li>
-		<li class=" tsd-kind-interface tsd-is-not-exported">
-			<a href="../interfaces/idocument.html" class="tsd-kind-icon">IDocument</a>
-		</li>
 		<li class=" tsd-kind-interface">
 			<a href="../interfaces/iinactivityconfigparams.html" class="tsd-kind-icon">IInactivity<wbr>Config<wbr>Params</a>
-		</li>
-		<li class=" tsd-kind-interface tsd-is-not-exported">
-			<a href="../interfaces/iwindow.html" class="tsd-kind-icon">IWindow</a>
 		</li>
 	</ul>
 </nav>
@@ -1037,6 +1034,7 @@ img { max-width: 100%; }
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="inactivitylogout.html#lastresettimestamp" class="tsd-kind-icon">last<wbr>Reset<wbr>Time<wbr>Stamp</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="inactivitylogout.html#localstorage" class="tsd-kind-icon">local<wbr>Storage</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="inactivitylogout.html#localstoragekey" class="tsd-kind-icon">local<wbr>Storage<wbr>Key</a></li>
+							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="inactivitylogout.html#params" class="tsd-kind-icon">params</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="inactivitylogout.html#signouthref" class="tsd-kind-icon">sign<wbr>OutHREF</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="inactivitylogout.html#startcountdowntimerat" class="tsd-kind-icon">start<wbr>Count<wbr>Down<wbr>Timer<wbr>At</a></li>
 							<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="inactivitylogout.html#timeoutcallback" class="tsd-kind-icon">timeout<wbr>Callback</a></li>
@@ -1075,13 +1073,13 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L37">inactivity-logout.ts:37</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L47">inactivity-logout.ts:47</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> params: <a href="../interfaces/iinactivityconfigparams.html" class="tsd-signature-type">IInactivityConfigParams</a><span class="tsd-signature-symbol"> =&nbsp;{}</span></h5>
+								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> params: <a href="../interfaces/iinactivityconfigparams.html" class="tsd-signature-type">IInactivityConfigParams</a><span class="tsd-signature-symbol"> =&nbsp;defaultInactivityConfigParams</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="inactivitylogout.html" class="tsd-signature-type">InactivityLogout</a></h4>
@@ -1097,7 +1095,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">count<wbr>Down<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L34">inactivity-logout.ts:34</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L44">inactivity-logout.ts:44</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1128,7 +1126,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">count<wbr>Down<wbr>Cancelled<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L35">inactivity-logout.ts:35</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L45">inactivity-logout.ts:45</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1153,7 +1151,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">counting<wbr>Down<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L31">inactivity-logout.ts:31</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L41">inactivity-logout.ts:41</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1163,7 +1161,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">current<wbr>Timer<wbr>Precision<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L37">inactivity-logout.ts:37</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L47">inactivity-logout.ts:47</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1173,7 +1171,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">idle<wbr>TimeoutID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L36">inactivity-logout.ts:36</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L46">inactivity-logout.ts:46</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1183,7 +1181,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">idle<wbr>Timeout<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L24">inactivity-logout.ts:24</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L34">inactivity-logout.ts:34</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1193,7 +1191,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">last<wbr>Reset<wbr>Time<wbr>Stamp<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;(new Date()).getTime()</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L28">inactivity-logout.ts:28</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L38">inactivity-logout.ts:38</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1203,7 +1201,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">local<wbr>Storage<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Storage</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L29">inactivity-logout.ts:29</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L39">inactivity-logout.ts:39</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1213,7 +1211,17 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">local<wbr>Storage<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L27">inactivity-logout.ts:27</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L37">inactivity-logout.ts:37</a></li>
+					</ul>
+				</aside>
+			</section>
+			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+				<a name="params" class="tsd-anchor"></a>
+				<h3>params</h3>
+				<div class="tsd-signature tsd-kind-icon">params<span class="tsd-signature-symbol">:</span> <a href="../interfaces/iinactivityconfigparams.html" class="tsd-signature-type">IInactivityConfigParams</a></div>
+				<aside class="tsd-sources">
+					<ul>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L49">inactivity-logout.ts:49</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1223,7 +1231,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">sign<wbr>OutHREF<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L30">inactivity-logout.ts:30</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L40">inactivity-logout.ts:40</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1233,7 +1241,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">start<wbr>Count<wbr>Down<wbr>Timer<wbr>At<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L26">inactivity-logout.ts:26</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L36">inactivity-logout.ts:36</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1243,7 +1251,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">timeout<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L33">inactivity-logout.ts:33</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L43">inactivity-logout.ts:43</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-type-declaration">
@@ -1268,7 +1276,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">timeout<wbr>Precision<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L25">inactivity-logout.ts:25</a></li>
+						<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L35">inactivity-logout.ts:35</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1285,7 +1293,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L120">inactivity-logout.ts:120</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L126">inactivity-logout.ts:126</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1302,7 +1310,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L145">inactivity-logout.ts:145</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L151">inactivity-logout.ts:151</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1325,7 +1333,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L90">inactivity-logout.ts:90</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L98">inactivity-logout.ts:98</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1342,7 +1350,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L190">inactivity-logout.ts:190</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L196">inactivity-logout.ts:196</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Storage</span></h4>
@@ -1359,7 +1367,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L162">inactivity-logout.ts:162</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L168">inactivity-logout.ts:168</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -1376,7 +1384,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L132">inactivity-logout.ts:132</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L138">inactivity-logout.ts:138</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1399,7 +1407,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L105">inactivity-logout.ts:105</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L111">inactivity-logout.ts:111</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1416,7 +1424,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L206">inactivity-logout.ts:206</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L212">inactivity-logout.ts:212</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1439,7 +1447,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L178">inactivity-logout.ts:178</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L184">inactivity-logout.ts:184</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1462,7 +1470,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L78">inactivity-logout.ts:78</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L86">inactivity-logout.ts:86</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1485,7 +1493,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L86">inactivity-logout.ts:86</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L94">inactivity-logout.ts:94</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1502,7 +1510,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/0b6847a/src/inactivity-logout.ts#L110">inactivity-logout.ts:110</a></li>
+								<li>Defined in <a href="https://github.com/Benefex/inactivity-logout/blob/c109269/src/inactivity-logout.ts#L116">inactivity-logout.ts:116</a></li>
 							</ul>
 						</aside>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>

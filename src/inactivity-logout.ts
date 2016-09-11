@@ -23,6 +23,11 @@ interface IDocument extends Document {
 
 declare var document: IDocument;
 
+const defaultInactivityConfigParams: IInactivityConfigParams = {
+    idleTimeoutTime: 10000,
+    timeoutPrecision: 1000,
+    localStorageKey: 'inactivity_logout_local_storage'
+};
 
 // require('./ie8addEventListener');
 export class InactivityLogout {
@@ -41,7 +46,7 @@ export class InactivityLogout {
     private idleTimeoutID: number;
     private currentTimerPrecision: number;
 
-    constructor(private params: IInactivityConfigParams = {}) {
+    constructor(private params: IInactivityConfigParams = defaultInactivityConfigParams) {
         // config var defaults
         // how long you can be idle for before we time you out
         this.idleTimeoutTime = params.idleTimeoutTime || 10000;
