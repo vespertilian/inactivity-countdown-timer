@@ -12,6 +12,7 @@
     "document": "cross-env npm run typedoc -- --out ./docs src/inactivity-logout.ts --theme minimal --mode file --readme none --excludeNotExported",
     "prepublish": "cross-env npm run build",
     "postinstall": "cross-env npm run typings install",
+    "commit": "git-cz",
     "typings": "typings",
     "typedoc": "typedoc"
   },
@@ -19,7 +20,9 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
+    "commitizen": "2.8.6",
     "cross-env": "1.0.8",
+    "cz-conventional-changelog": "1.2.0",
     "jasmine": "2.4.1",
     "karma": "0.13.22",
     "karma-chrome-launcher": "1.0.1",
@@ -34,5 +37,8 @@
     "typings": "1.3.3",
     "webpack": "1.13.1",
     "webpack-dev-server": "1.14.1"
+  },
+  "czConfig": {
+    "path": "node_modules/cz-conventional-changelog"
   }
 }
