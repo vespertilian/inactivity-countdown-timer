@@ -9,6 +9,7 @@ export interface IInactivityConfigParams {
     logoutHREF?: string;
 }
 export declare class InactivityLogout {
+    private params;
     private idleTimeoutTime;
     private timeoutPrecision;
     private startCountDownTimerAt;

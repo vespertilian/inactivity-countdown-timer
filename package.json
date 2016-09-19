@@ -1,5 +1,5 @@
 {
-  "name": "@benefex/inactivity-logout",
+  "name": "inactivity-logout",
   "version": "1.0.0-beta-0",
   "description": "A vanilla JS library to automatically logout users after a specified time",
   "main": "dist/main.js",

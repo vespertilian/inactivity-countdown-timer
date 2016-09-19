@@ -1,5 +1,16 @@
-(function() {
-    console.log('polyfilling ie8 add event listener');
+// This code from MDN (Mozilla Developer Network)
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+// Public domain licenced
+// https://creativecommons.org/publicdomain/zero/1.0/
+
+// ie8 specific typings
+interface IDocument extends Document {
+    attachEvent(event: string, obj: any): boolean;
+}
+declare var document: IDocument;
+declare var Event;
+
+export const ie8EventListenerPolyfill = (function() {
     if (!Event.prototype.preventDefault) {
         Event.prototype.preventDefault=function() {
             this.returnValue=false;

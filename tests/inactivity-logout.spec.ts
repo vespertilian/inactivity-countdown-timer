@@ -203,7 +203,7 @@ function dispatchMouseEvent(eventName: string): void {
     dispatchEvent(document, docEvent);
 }
 
-// IE8 fix
+// IE8 fix for tests
 function dispatchEvent(element: any, event: Event): void {
     if(element['dispatchEvent']){
         element.dispatchEvent(event, true)

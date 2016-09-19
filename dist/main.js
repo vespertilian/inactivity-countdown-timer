@@ -55,25 +55,27 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	// fix ie8 console error
-	(function () {
-	    if (typeof console == "undefined") {
-	        this.console = { log: function () { } };
-	    }
-	})();
 	var inactivity_logout_1 = __webpack_require__(1);
 	exports.InactivityLogout = inactivity_logout_1.InactivityLogout;
+	var ie8EventListenerPolyfill_1 = __webpack_require__(2);
+	exports.ie8EventListenerPolyfill = ie8EventListenerPolyfill_1.ie8EventListenerPolyfill;
 
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	__webpack_require__(2);
+	var defaultInactivityConfigParams = {
+	    idleTimeoutTime: 10000,
+	    timeoutPrecision: 1000,
+	    localStorageKey: 'inactivity_logout_local_storage'
+	};
+	// require('./ie8addEventListener');
 	var InactivityLogout = (function () {
 	    function InactivityLogout(params) {
-	        if (params === void 0) { params = {}; }
+	        if (params === void 0) { params = defaultInactivityConfigParams; }
+	        this.params = params;
 	        this.lastResetTimeStamp = (new Date()).getTime();
 	        this.countingDown = false;
 	        // config var defaults
@@ -97,18 +99,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // setup local storage
 	        this.localStorage = this.detectAndAssignLocalStorage();
 	        this.start(this.timeoutPrecision);
-	        var Idocument = document;
-	        var Iwindow = window;
 	        // attach events that will rest the timers
 	        // this ends up calling the this.handleEvent function
 	        // see README.md for more on why we are passing this
-	        Idocument.addEventListener('click', this, false);
-	        Idocument.addEventListener('mousemove', this, false);
-	        Idocument.addEventListener('keypress', this, false);
-	        Iwindow.addEventListener('load', this, false); // effectively a no-op
+	        document.addEventListener('click', this, false);
+	        document.addEventListener('mousemove', this, false);
+	        document.addEventListener('keypress', this, false);
+	        window.addEventListener('load', this, false); // effectively a no-op
 	        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
 	        // this fixes a bug in ie11 where the local storage does not sync
-	        Iwindow.addEventListener('storage', function () { }); // effectively a no-op
+	        window.addEventListener('storage', function () { }); // effectively a no-op
 	    }
 	    InactivityLogout.prototype.start = function (precision) {
 	        var _this = this;
@@ -122,15 +122,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        window.clearInterval(this.idleTimeoutID);
 	    };
 	    InactivityLogout.prototype.cleanup = function () {
-	        var Idocument = document;
-	        var Iwindow = window;
-	        Idocument.removeEventListener('click', this, false);
-	        Idocument.removeEventListener('mousemove', this, false);
-	        Idocument.removeEventListener('keypress', this, false);
-	        Iwindow.removeEventListener('load', this, false); // effectively a no-op
+	        document.removeEventListener('click', this, false);
+	        document.removeEventListener('mousemove', this, false);
+	        document.removeEventListener('keypress', this, false);
+	        window.removeEventListener('load', this, false); // effectively a no-op
 	        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
 	        // this fixes a bug in ie11 where the local storage does not sync
-	        Iwindow.removeEventListener('storage', function () { }); // effectively a no-op
+	        window.removeEventListener('storage', function () { }); // effectively a no-op
 	        this.stop();
 	    };
 	    // see readme about why we use handleEvent
@@ -247,60 +245,65 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports) {
 
-	(function() {
-	    console.log('polyfilling ie8 add event listener');
+	// This code from MDN (Mozilla Developer Network)
+	// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+	// Public domain licenced
+	// https://creativecommons.org/publicdomain/zero/1.0/
+	"use strict";
+	exports.ie8EventListenerPolyfill = (function () {
 	    if (!Event.prototype.preventDefault) {
-	        Event.prototype.preventDefault=function() {
-	            this.returnValue=false;
+	        Event.prototype.preventDefault = function () {
+	            this.returnValue = false;
 	        };
 	    }
 	    if (!Event.prototype.stopPropagation) {
-	        Event.prototype.stopPropagation=function() {
-	            this.cancelBubble=true;
+	        Event.prototype.stopPropagation = function () {
+	            this.cancelBubble = true;
 	        };
 	    }
 	    if (!Element.prototype.addEventListener) {
-	        var eventListeners=[];
-
-	        var addEventListener=function(type,listener /*, useCapture (will be ignored) */) {
-	            var self=this;
-	            var wrapper=function(e) {
-	                e.target=e.srcElement;
-	                e.currentTarget=self;
+	        var eventListeners = [];
+	        var addEventListener = function (type, listener /*, useCapture (will be ignored) */) {
+	            var self = this;
+	            var wrapper = function (e) {
+	                e.target = e.srcElement;
+	                e.currentTarget = self;
 	                if (typeof listener.handleEvent != 'undefined') {
 	                    listener.handleEvent(e);
-	                } else {
-	                    listener.call(self,e);
+	                }
+	                else {
+	                    listener.call(self, e);
 	                }
 	            };
-	            if (type=="DOMContentLoaded") {
-	                var wrapper2=function(e) {
-	                    if (document.readyState=="complete") {
+	            if (type == "DOMContentLoaded") {
+	                var wrapper2 = function (e) {
+	                    if (document.readyState == "complete") {
 	                        wrapper(e);
 	                    }
 	                };
-	                document.attachEvent("onreadystatechange",wrapper2);
-	                eventListeners.push({object:this,type:type,listener:listener,wrapper:wrapper2});
-
-	                if (document.readyState=="complete") {
-	                    var e=new Event();
-	                    e.srcElement=window;
+	                document.attachEvent("onreadystatechange", wrapper2);
+	                eventListeners.push({ object: this, type: type, listener: listener, wrapper: wrapper2 });
+	                if (document.readyState == "complete") {
+	                    var e = new Event();
+	                    e.srcElement = window;
 	                    wrapper2(e);
 	                }
-	            } else {
-	                this.attachEvent("on"+type,wrapper);
-	                eventListeners.push({object:this,type:type,listener:listener,wrapper:wrapper});
+	            }
+	            else {
+	                this.attachEvent("on" + type, wrapper);
+	                eventListeners.push({ object: this, type: type, listener: listener, wrapper: wrapper });
 	            }
 	        };
-	        var removeEventListener=function(type,listener /*, useCapture (will be ignored) */) {
-	            var counter=0;
-	            while (counter<eventListeners.length) {
-	                var eventListener=eventListeners[counter];
-	                if (eventListener.object==this && eventListener.type==type && eventListener.listener==listener) {
-	                    if (type=="DOMContentLoaded") {
-	                        this.detachEvent("onreadystatechange",eventListener.wrapper);
-	                    } else {
-	                        this.detachEvent("on"+type,eventListener.wrapper);
+	        var removeEventListener = function (type, listener /*, useCapture (will be ignored) */) {
+	            var counter = 0;
+	            while (counter < eventListeners.length) {
+	                var eventListener = eventListeners[counter];
+	                if (eventListener.object == this && eventListener.type == type && eventListener.listener == listener) {
+	                    if (type == "DOMContentLoaded") {
+	                        this.detachEvent("onreadystatechange", eventListener.wrapper);
+	                    }
+	                    else {
+	                        this.detachEvent("on" + type, eventListener.wrapper);
 	                    }
 	                    eventListeners.splice(counter, 1);
 	                    break;
@@ -308,18 +311,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                ++counter;
 	            }
 	        };
-	        Element.prototype.addEventListener=addEventListener;
-	        Element.prototype.removeEventListener=removeEventListener;
+	        Element.prototype.addEventListener = addEventListener;
+	        Element.prototype.removeEventListener = removeEventListener;
 	        if (HTMLDocument) {
-	            HTMLDocument.prototype.addEventListener=addEventListener;
-	            HTMLDocument.prototype.removeEventListener=removeEventListener;
+	            HTMLDocument.prototype.addEventListener = addEventListener;
+	            HTMLDocument.prototype.removeEventListener = removeEventListener;
 	        }
 	        if (Window) {
-	            Window.prototype.addEventListener=addEventListener;
-	            Window.prototype.removeEventListener=removeEventListener;
+	            Window.prototype.addEventListener = addEventListener;
+	            Window.prototype.removeEventListener = removeEventListener;
 	        }
 	    }
 	})();
+
 
 /***/ }
 /******/ ])

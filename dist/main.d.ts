@@ -1,2 +1,2 @@
 export { InactivityLogout } from './inactivity-logout';
-export { IInactivityConfigParams } from './inactivity-logout';
+export { ie8EventListenerPolyfill } from './ie8EventListenerPolyfill';

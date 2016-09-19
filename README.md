@@ -2,7 +2,7 @@
 
 ## Install 
 
-npm i @benefex/util-angular --save
+npm i util-angular --save
 
 ## Usage
 
