@@ -1,12 +1,31 @@
 # A vanilla JS library to automatically logout users after a specified time
 
+This is a plain JS (Typescript) module that will fire a callback you provide, or redirect to a url you provide. After a specified time of inactivity. 
+
+Can be used to transition away from sensitive on screen information and log a user out, if they forget to close their browser or tab.
+
+Provides countDownCallbacks to alert users they are going to be logged out
+
+By default the inactivity timeout is reset by these events: 
+
+- clicks
+- mousemovement
+- keypresses
+
+The timeout is synced across browser tabs via local storage. So being active in a second tab will not log you out of the first.
+
 ## Install 
 
-npm i util-angular --save
+******** package name forthcoming placeholder: `npm install inactivity-logout --save`
+
+## Supports
+
+ - IE8+ (you need to include the ie8EventListenerPolyfill)
+ - Chrome
+ - Firefox
+ - Safari
 
 ## Usage
-
-**Make sure you cleanup the object before deleting**
 
 ```js
 // Optional config vars
@@ -30,11 +49,46 @@ IL.cleanup(()
 
 ```
 
-## How we deal with the context of `this` when attaching an event listener
+**Make sure you cleanup the object before deleting**
 
-It's not easy to set the context of this when you need to support IE8 because you cannot use .bind. So we have to use the handleEvent work around described on MDN
 
-```js
+## Development
+
+The project is setup with both main.ts used for exporting the library and a demo.ts used to demo components and setup testing.
+
+### Installing
+`npm install` installs node modules and runs tests
+
+### NPM Tasks
+`npm start` runs a development server
+`npm test` runs the tests via karma (from the main ts file) 
+`npm test-via-saucelabs` runs the tests via karma against Saucelabs config(from the main ts file) 
+`npm build` builds a version for distribution via npm
+`npm prepublish` used when publishing to npm
+
+### Publishing workflow
+1. Run tests `npm test`
+2. Run build and check that your module was built (needs to be exported via main.ts)
+3. Install it into your project to test before publishing by running `npm install '/path-to-this/'`
+4. Bump version in package.json following [Semantic Versioning] SemVer
+5. Tag the release commit in git: `git tag -a v0.1.5 -m "Published v0.1.5"`
+6. Push the tags up to github: `git push origin --tags`
+7. Publish `npm publish`
+  
+[Semantic Versioning]: http://semver.org/
+[EventTarget.addEventListener()]: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+
+
+
+## IE8 Notes
+
+Make sure you are importing the **included ie8EventListenerPolyfill** when supporting ie8.
+
+### How we deal with the context of `this` when attaching an event listener
+
+It's not easy to set the context of this when you need to support IE8 because you cannot use .bind. So we have to use the handleEvent work around:
+
+```ts
 export class InactivityLogout {
         constructor(){
             // we pass in the value this not a function 
@@ -50,9 +104,8 @@ export class InactivityLogout {
 }
 ```
 
-### From MDN dealing with handling the attached EventListners 
+### Excerpt from MDN dealing with handling the attached EventListeners 
 
-Read more about [EventTarget.addEventListener()] on MDN
 
 ##### The value of **this** within the handler 
 
@@ -86,36 +139,5 @@ var Something = function(element) {
   element.removeEventListener('dblclick', this, false);
 }
 ```
-## Supports
 
- - IE8+
- - Chrome
- - Firefox
- - Safari
-
-## Development
-
-The project is setup with both main.ts used for exporting the library and a demo.ts used to demo components and setup testing.
-
-### Installing
-`npm install` installs node modules and runs tests
-
-### NPM Tasks
-`npm start` runs a development server
-`npm test` runs the tests via karma (from the main ts file) 
-`npm build` builds a version for distribution via npm
-`npm prepublish` used when publishing to npm
-
-### Publishing workflow
-1. Run tests `npm test`
-2. Run build and check that your module was built (needs to be exported via main.ts)
-3. Install it into your project to test before publishing by running `npm install '/path-to-this/'`
-4. Bump version in package.json following [Semantic Versioning] SemVer
-5. Tag the release commit in git: `git tag -a v0.1.5 -m "Published v0.1.5"`
-6. Push the tags up to github: `git push origin --tags`
-7. Publish `npm publish`
-  
-[Semantic Versioning]: http://semver.org/
-
-
-[EventTarget.addEventListener()]: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+Read the full document ont [EventTarget.addEventListener()] on MDN

@@ -73,7 +73,7 @@ export class InactivityLogout {
 
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
-        // see README.md for more on why we are passing this
+        // see README.md for more on why we are passing 'this'
         document.addEventListener('click', this, false);
         document.addEventListener('mousemove', this, false);
         document.addEventListener('keypress', this, false);
@@ -108,7 +108,9 @@ export class InactivityLogout {
     }
 
     // see readme about why we use handleEvent
-    private handleEvent(): void {
+    private handleEvent(eventName: string): void {
+        // we don't need to do anything with the eventName
+        // as we want all events to fire the same actions
         let currentTime = (new Date).getTime();
         this.setLastResetTimeStamp(currentTime);
     }
@@ -198,12 +200,12 @@ export class InactivityLogout {
         let storage: Storage = localStorage;
         let result: boolean;
         try {
-            storage.setItem( uid, uid);
+            storage.setItem(uid, uid);
             result = storage.getItem(uid) === uid;
             storage.removeItem(uid);
             return result && storage;
         } catch(exception) {
-            console.log('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
+            console.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
         }
     }
 
