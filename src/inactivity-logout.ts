@@ -138,12 +138,11 @@ export class InactivityLogout {
     }
 
     private handleCountDown(timeRemaining: number) {
-        if(this.countDownCallback && (timeRemaining <= this.startCountDownTimerAt)){
+        let inCountDownTimeFrame = timeRemaining <= this.startCountDownTimerAt;
+        if(inCountDownTimeFrame && this.countDownCallback){
             this.countingDown = true;
             this.countDownCallback(Math.abs(Math.ceil(timeRemaining/1000)));
-        } else if (this.countingDown){
-            // if we are already counting down
-            // alert we no longer are
+        } else if (!inCountDownTimeFrame && this.countingDown) {
             this.countDownCancelledCallback();
             this.countingDown = false;
         }
