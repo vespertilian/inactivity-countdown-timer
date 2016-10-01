@@ -74,7 +74,7 @@ export class InactivityLogout {
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
 
-        this.start(this.timeoutPrecision);
+        this.start();
 
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
@@ -91,12 +91,8 @@ export class InactivityLogout {
     /**
      * Starts the timer
      */
-    public start(precision: number): void {
-        this.currentTimerPrecision = precision;
-        this.setLastResetTimeStamp((new Date()).getTime());
-        this.idleTimeoutID = window.setInterval(() => {
-            this.checkIdleTime();
-        }, precision);
+    public start(): void {
+        this.startPrivate(this.timeoutPrecision)
     }
 
     /**
@@ -129,6 +125,14 @@ export class InactivityLogout {
         // as we want all events to fire the same actions
         let currentTime = (new Date).getTime();
         this.setLastResetTimeStamp(currentTime);
+    }
+
+    private startPrivate(precision: number) {
+        this.currentTimerPrecision = precision;
+        this.setLastResetTimeStamp((new Date()).getTime());
+        this.idleTimeoutID = window.setInterval(() => {
+            this.checkIdleTime();
+        }, precision);
     }
 
     private timeout(): void {
@@ -172,12 +176,12 @@ export class InactivityLogout {
         if(timeRemaining < increasePrecisionTime){
             if(this.currentTimerPrecision !== 1000) {
                 this.stop();
-                this.start(1000);
+                this.startPrivate(1000);
             }
         } else {
             if(this.currentTimerPrecision !== this.timeoutPrecision){
                this.stop();
-               this.start(this.timeoutPrecision)
+               this.startPrivate(this.timeoutPrecision)
             }
         }
     }
