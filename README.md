@@ -1,10 +1,17 @@
-# A vanilla JS library to automatically logout users after a specified time
+# A vanilla JS library to fire a callback or redirect to a url after a specified time
 
 This is a plain JS (Typescript) module that will fire a callback you provide, or redirect to a url you provide. After a specified time of inactivity. 
 
-Can be used to transition away from sensitive on screen information and log a user out, if they forget to close their browser or tab.
+Can be used to transition away from sensitive on screen information and redirect to another page (logout or other page). 
+Useful when a user forgets to close their browser or tab before walking away from their computer.
 
-Provides countDownCallbacks to alert users they are going to be logged out
+Features 
+ - Written in typescript and bundled as a UMD module.
+ - A countDownCallback with the time-remaining you can use to alert users they are going to be logged out.
+ - A countDownCancelled callback. So you can stop showing time remaining.
+ - A timeoutCallback.
+ - Dynamically adjusting timer. Which will set itself to the largest timeout time, then change to timeout every second for the countdown. 
+ - Syncs across tabs using local storaget 
 
 By default the inactivity timeout is reset by these events: 
 
@@ -31,13 +38,12 @@ The timeout is synced across browser tabs via local storage. So being active in 
 // Optional config vars
 {
     idleTimeoutTime?: number;
-    timeoutPrecision?: number;
     startCountDownTimerAt?: number;
     localStorageKey?: string;
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
-    logoutHREF?: string;
+    ***** changeParamName logoutHREF?: string;
 }
 
 // Instantiate new logout object
