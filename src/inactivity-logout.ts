@@ -1,6 +1,5 @@
 export interface IInactivityConfigParams {
     idleTimeoutTime?: number;
-    timeoutPrecision?: number;
     startCountDownTimerAt?: number;
     localStorageKey?: string;
     timeoutCallback?(): void;
@@ -25,17 +24,16 @@ declare var document: IDocument;
 
 const defaultInactivityConfigParams: IInactivityConfigParams = {
     idleTimeoutTime: 10000,
-    timeoutPrecision: 1000,
     localStorageKey: 'inactivity_logout_local_storage'
 };
 
 // require('./ie8addEventListener');
 export class InactivityLogout {
     private idleTimeoutTime: number;
-    private timeoutPrecision: number;
+    private timeoutTime: number;
     private startCountDownTimerAt: number;
     private localStorageKey: string;
-    private lastResetTimeStamp: number = (new Date()).getTime();
+    private lastResetTimeStamp: number;
     private localStorage: Storage;
     private signOutHREF: string;
     private countingDown: boolean = false;
@@ -48,20 +46,26 @@ export class InactivityLogout {
     /**
      * @param params
      * - **idleTimeoutTime**: 10000 - ms / 10 seconds
-     * - **timeoutPrecision**: 1000 - ms / 1 second
      * - **localStorageKey**: 'inactivity_logout_local_storage'
      */
     constructor(private params: IInactivityConfigParams = defaultInactivityConfigParams) {
         // config var defaults
         // how long you can be idle for before we time you out
         this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfigParams.idleTimeoutTime;
+
+        // if start count down timer is present make sure its a number and less than idleTimeoutTime
         if((typeof(params.startCountDownTimerAt)) === 'number'){
             if(params.startCountDownTimerAt > this.idleTimeoutTime) {
                 console.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
-                this.startCountDownTimerAt = this.idleTimeoutTime
+                this.startCountDownTimerAt = this.idleTimeoutTime;
+                this.timeoutTime = 1000; // start the countdown
             } else {
-                this.startCountDownTimerAt = params.startCountDownTimerAt
+                this.startCountDownTimerAt = params.startCountDownTimerAt;
+                this.timeoutTime = this.idleTimeoutTime - this.startCountDownTimerAt;
             }
+        } else {
+            this.startCountDownTimerAt = 0;
+            this.timeoutTime = this.idleTimeoutTime;
         }
 
         this.timeoutCallback = params.timeoutCallback;
@@ -69,7 +73,6 @@ export class InactivityLogout {
         this.countDownCancelledCallback = params.countDownCancelledCallback;
         this.localStorageKey = params.localStorageKey || defaultInactivityConfigParams.localStorageKey;
         this.signOutHREF = params.logoutHREF;
-        this.timeoutPrecision = params.timeoutPrecision || defaultInactivityConfigParams.timeoutPrecision;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
@@ -92,7 +95,8 @@ export class InactivityLogout {
         // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         // this fixes a bug in ie11 where the local storage does not sync
         window.addEventListener('storage', function() {}); // effectively a no-op
-        this.startPrivate(this.timeoutPrecision)
+        this.setLastResetTimeStamp((new Date()).getTime());
+        this.startPrivate(this.timeoutTime)
     }
 
     /**
@@ -128,11 +132,16 @@ export class InactivityLogout {
     }
 
     private startPrivate(precision: number) {
+        // console.log('start timer with precision: ', precision);
         this.currentTimerPrecision = precision;
-        this.setLastResetTimeStamp((new Date()).getTime());
         this.idleTimeoutID = window.setInterval(() => {
             this.checkIdleTime();
         }, precision);
+    }
+
+    private resetTimer(precision: number){
+        this.stop();
+        this.startPrivate(precision);
     }
 
     private timeout(): void {
@@ -158,12 +167,14 @@ export class InactivityLogout {
     }
 
     private handleCountDown(timeRemaining: number) {
-        let inCountDownTimeFrame = timeRemaining <= this.startCountDownTimerAt;
+        let inCountDownTimeFrame = (timeRemaining <= this.startCountDownTimerAt);
         if(inCountDownTimeFrame && this.countDownCallback){
             this.countingDown = true;
             this.countDownCallback(Math.abs(Math.ceil(timeRemaining/1000)));
         } else if (!inCountDownTimeFrame && this.countingDown) {
-            this.countDownCancelledCallback();
+            if(this.countDownCancelledCallback) {
+                this.countDownCancelledCallback();
+            }
             this.countingDown = false;
         }
     }
@@ -172,16 +183,18 @@ export class InactivityLogout {
     private checkTimerPrecision(timeRemaining: number) {
         // when we are counting down we want to
         // increase the interval precision to seconds
-        let increasePrecisionTime = this.startCountDownTimerAt + this.timeoutPrecision;
-        if(timeRemaining < increasePrecisionTime){
+        if(timeRemaining <= this.startCountDownTimerAt){
+            // don't change if it's already seconds
             if(this.currentTimerPrecision !== 1000) {
-                this.stop();
-                this.startPrivate(1000);
+                this.resetTimer(1000)
             }
-        } else {
-            if(this.currentTimerPrecision !== this.timeoutPrecision){
-               this.stop();
-               this.startPrivate(this.timeoutPrecision)
+        }
+        else {
+            // don't change if it's already the timeoutTime
+            if(this.currentTimerPrecision !== this.timeoutTime){
+               // we are now one second behind
+               // as we would have been counting down
+               this.resetTimer(this.timeoutTime - 1000)
             }
         }
     }

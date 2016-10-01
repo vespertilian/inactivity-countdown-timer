@@ -97,8 +97,10 @@ describe('Inactivity logout -', () => {
             jasmine.clock().tick(9000);
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
+            expect(callback).toHaveBeenCalledTimes(1);
             expect(callback).toHaveBeenCalledWith(10);
             jasmine.clock().tick(1000);
+            expect(callback).toHaveBeenCalledTimes(2);
             expect(callback).toHaveBeenCalledWith(9);
             jasmine.clock().tick(1000);
             expect(callback).toHaveBeenCalledWith(8);
@@ -126,10 +128,40 @@ describe('Inactivity logout -', () => {
             jasmine.clock().tick(2000);
             expect(countDownCancelledCallback).toHaveBeenCalled();
             cleanupWithClock(IL)
-        })
+        });
+
     });
 
-
+    describe('timeoutPrecision', () => {
+        it('should dynamically adjust the timeout precision', () => {
+            let countDownCallback = jasmine.createSpy('countDownCallback');
+            let settings: IInactivityConfigParams = {
+                idleTimeoutTime: 1000 * 60 * 5, // 5 minutes
+                startCountDownTimerAt: 1000 * 30, // 30 seconds
+                countDownCallback: countDownCallback
+            };
+            let IL = setupWithClock(settings);
+            let fourMins = 1000 * 60 * 4;
+            let twentyNineSeconds = 1000 * 29;
+            // should call countdown callback only once at 4:30
+            // then every second
+            jasmine.clock().tick(fourMins + twentyNineSeconds); // 4:29
+            expect(countDownCallback).not.toHaveBeenCalled();
+            jasmine.clock().tick(1000); // 4:30 seconds
+            expect(countDownCallback).toHaveBeenCalledTimes(1);
+            jasmine.clock().tick(1000); // 4:31 seconds
+            expect(countDownCallback).toHaveBeenCalledTimes(2);
+            jasmine.clock().tick(1000); // 4:32 seconds
+            expect(countDownCallback).toHaveBeenCalledTimes(3);
+            dispatchMouseEvent('click'); // timer will reset and initialise at 5 mins
+            expect(countDownCallback).toHaveBeenCalledTimes(3);
+            jasmine.clock().tick(fourMins + twentyNineSeconds); // 4:29
+            expect(countDownCallback).toHaveBeenCalledTimes(3);
+            jasmine.clock().tick(1000); // 4:30
+            expect(countDownCallback).toHaveBeenCalledTimes(4);
+            cleanupWithClock(IL);
+        });
+    });
 
     describe('localstorage - ', () => {
         it('should react to updates by other windows through local storage', () => {
