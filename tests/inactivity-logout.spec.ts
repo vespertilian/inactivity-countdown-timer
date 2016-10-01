@@ -31,24 +31,18 @@ describe('Inactivity logout -', () => {
 
     describe('timing out -', () => {
         it('should call timeout when the idleTimeout is finished', () => {
-            jasmine.clock().install();
-            jasmine.clock().mockDate();
-            let IL = new InactivityLogout({idleTimeoutTime: 2000});
+            let IL = setupWithClock({idleTimeoutTime: 2000});
             // we need to call through so the interval timer stops watching
             let timeout = spyOn(IL, 'timeout').and.callThrough();
             expect(timeout).not.toHaveBeenCalled();
             jasmine.clock().tick(2001);
             expect(timeout).toHaveBeenCalled();
-            IL.cleanup();
-            IL = null;
-            jasmine.clock().uninstall();
+            cleanupWithClock(IL);
         });
 
         it('should reset the idleTimeout if one of the event handlers get\s called', () => {
             ['click', 'mousemove', 'keypress'].forEach(() => {
-                jasmine.clock().install();
-                jasmine.clock().mockDate();
-                let IL = new InactivityLogout({idleTimeoutTime: 2000});
+                let IL = setupWithClock({idleTimeoutTime: 2000});
                 // we need to call through so the interval timer stops watching
                 let timeout = spyOn(IL, 'timeout').and.callThrough();
                 jasmine.clock().tick(1001); // 1001 total time
@@ -58,24 +52,20 @@ describe('Inactivity logout -', () => {
                 expect(timeout).not.toHaveBeenCalled();
                 jasmine.clock().tick(4000); // 3001
                 expect(timeout).toHaveBeenCalledTimes(1);
-                IL.cleanup();
-                IL = null;
-                jasmine.clock().uninstall();
+                cleanupWithClock(IL)
             });
         });
     });
 
     describe('countdown - ', () => {
         it('should start calling the countdown timer callback when the time reaches the startCountdownTimerAt value', () => {
-            jasmine.clock().install();
-            jasmine.clock().mockDate();
             let callback = jasmine.createSpy('callback');
             let settings: IInactivityConfigParams = {
                 idleTimeoutTime: 20000,
                 startCountDownTimerAt: 10000,
                 countDownCallback: callback
             };
-            let IL = new InactivityLogout(settings);
+            let IL = setupWithClock(settings);
             jasmine.clock().tick(9000);
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
@@ -84,15 +74,11 @@ describe('Inactivity logout -', () => {
             expect(callback).toHaveBeenCalledWith(9);
             jasmine.clock().tick(1000);
             expect(callback).toHaveBeenCalledWith(8);
-            expect(callback).toHaveBeenCalledTimes(3)
-            IL.cleanup();
-            IL = null;
-            jasmine.clock().uninstall();
+            expect(callback).toHaveBeenCalledTimes(3);
+            cleanupWithClock(IL)
         });
 
         it('should call a countdown cancelled callback when the countdown is aborted', () => {
-            jasmine.clock().install();
-            jasmine.clock().mockDate();
             let countDownCallback = jasmine.createSpy('countDownCallback');
             let countDownCancelledCallback = jasmine.createSpy('countDownCancelledCallback');
             let settings: IInactivityConfigParams = {
@@ -101,7 +87,7 @@ describe('Inactivity logout -', () => {
                 countDownCallback: countDownCallback,
                 countDownCancelledCallback: countDownCancelledCallback
             };
-            let IL = new InactivityLogout(settings);
+            let IL = setupWithClock(settings);
             jasmine.clock().tick(9000);
             expect(countDownCallback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
@@ -111,58 +97,42 @@ describe('Inactivity logout -', () => {
             dispatchMouseEvent('click'); // timer will reset and initialise at 20000
             jasmine.clock().tick(2000);
             expect(countDownCancelledCallback).toHaveBeenCalled();
-            IL.cleanup();
-            IL = null;
-            jasmine.clock().uninstall();
+            cleanupWithClock(IL)
         })
     });
 
     describe('redirection - ', () => {
         it('should redirect when the timeout expires if a url was passed in', () => {
-            jasmine.clock().install();
-            jasmine.clock().mockDate();
-            let IL = new InactivityLogout({idleTimeoutTime: 2000, logoutHREF: 'logout.html'});
+            let IL = setupWithClock({idleTimeoutTime: 2000, logoutHREF: 'logout.html'});
             let redirectFunction = spyOn(IL, 'redirect');
             expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
             jasmine.clock().tick(2001);
             expect(redirectFunction).toHaveBeenCalledWith('logout.html');
-            IL.cleanup();
-            IL = null;
-            jasmine.clock().uninstall();
+            cleanupWithClock(IL)
         });
 
         it('should not redirect when the timeout expires if a url was not passed in', () => {
-            jasmine.clock().install();
-            jasmine.clock().mockDate();
-            let IL = new InactivityLogout({idleTimeoutTime: 2000});
+            let IL = setupWithClock({idleTimeoutTime: 2000});
             let redirectFunction = spyOn(IL, 'redirect');
             jasmine.clock().tick(2001);
             expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
-            IL.cleanup();
-            IL = null;
-            jasmine.clock().uninstall();
+            cleanupWithClock(IL)
         });
     });
 
     describe('callback - ', () => {
         it('should execute a callback when the timeout expires if a callback was passed in', () => {
-            jasmine.clock().install();
-            jasmine.clock().mockDate();
             let callback = jasmine.createSpy('callback');
-            let IL = new InactivityLogout({idleTimeoutTime: 2000, timeoutCallback: callback});
+            let IL = setupWithClock({idleTimeoutTime: 2000, timeoutCallback: callback});
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(2001);
             expect(callback).toHaveBeenCalled();
-            IL.cleanup();
-            IL = null;
-            jasmine.clock().uninstall();
+            cleanupWithClock(IL)
         });
     });
 
     describe('localstorage - ', () => {
         it('should react to updates by other windows through local storage', () => {
-            jasmine.clock().install();
-            jasmine.clock().mockDate();
             let callback = jasmine.createSpy('callback');
             let localStorageKey = 'idleTimeoutTimeKey';
             let settings = {
@@ -170,7 +140,7 @@ describe('Inactivity logout -', () => {
                 timeoutCallback: callback,
                 localStorageKey: localStorageKey
             };
-            let IL = new InactivityLogout(settings);
+            let IL = setupWithClock(settings);
             jasmine.clock().tick(4000);
             expect(callback).not.toHaveBeenCalled();
             // reset the time
@@ -180,15 +150,23 @@ describe('Inactivity logout -', () => {
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(5000);
             expect(callback).toHaveBeenCalled();
-            IL.cleanup();
-            IL = null;
-            jasmine.clock().uninstall();
+            cleanupWithClock(IL)
         })
     })
 
 });
 
+function setupWithClock(params: IInactivityConfigParams): InactivityLogout {
+    jasmine.clock().install();
+    jasmine.clock().mockDate();
+    return new InactivityLogout(params);
+}
 
+function cleanupWithClock(IL: InactivityLogout): void {
+    IL.cleanup();
+    IL = null;
+    jasmine.clock().uninstall();
+}
 // see this link for eventClasses https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent#Notes
 function dispatchMouseEvent(eventName: string): void {
     // http://stackoverflow.com/questions/2490825/how-to-trigger-event-in-javascript
