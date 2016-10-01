@@ -45,11 +45,16 @@ export class InactivityLogout {
     private countDownCancelledCallback: () => void;
     private idleTimeoutID: number;
     private currentTimerPrecision: number;
-
+    /**
+     * @param params
+     * - **idleTimeoutTime**: 10000 - ms / 10 seconds
+     * - **timeoutPrecision**: 1000 - ms / 1 second
+     * - **localStorageKey**: 'inactivity_logout_local_storage'
+     */
     constructor(private params: IInactivityConfigParams = defaultInactivityConfigParams) {
         // config var defaults
         // how long you can be idle for before we time you out
-        this.idleTimeoutTime = params.idleTimeoutTime || 10000;
+        this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfigParams.idleTimeoutTime;
         if((typeof(params.startCountDownTimerAt)) === 'number'){
             if(params.startCountDownTimerAt > this.idleTimeoutTime) {
                 console.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
@@ -62,9 +67,9 @@ export class InactivityLogout {
         this.timeoutCallback = params.timeoutCallback;
         this.countDownCallback = params.countDownCallback;
         this.countDownCancelledCallback = params.countDownCancelledCallback;
-        this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
+        this.localStorageKey = params.localStorageKey || defaultInactivityConfigParams.localStorageKey;
         this.signOutHREF = params.logoutHREF;
-        this.timeoutPrecision = params.timeoutPrecision || 1000;
+        this.timeoutPrecision = params.timeoutPrecision || defaultInactivityConfigParams.timeoutPrecision;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
@@ -83,6 +88,9 @@ export class InactivityLogout {
         window.addEventListener('storage', function() {}); // effectively a no-op
     }
 
+    /**
+     * Starts the timer
+     */
     public start(precision: number): void {
         this.currentTimerPrecision = precision;
         this.setLastResetTimeStamp((new Date()).getTime());
@@ -91,10 +99,18 @@ export class InactivityLogout {
         }, precision);
     }
 
+    /**
+     * Clears the timer
+     */
     public stop(): void {
         window.clearInterval(this.idleTimeoutID);
     }
 
+    /**
+     * **You must call cleanup** before you delete the object.
+     * As the timer in the class is calling a method on itself
+     * it will not be garbage collected if you just delete it.
+     */
     public cleanup(): void {
         document.removeEventListener('click', this, false);
         document.removeEventListener('mousemove', this, false);
@@ -115,7 +131,7 @@ export class InactivityLogout {
         this.setLastResetTimeStamp(currentTime);
     }
 
-    public timeout(): void {
+    private timeout(): void {
         this.cleanup();
         if(this.timeoutCallback){
             this.timeoutCallback();
@@ -125,7 +141,7 @@ export class InactivityLogout {
         }
     }
 
-    checkIdleTime(){
+    private checkIdleTime(){
         let currentTimeStamp = (new Date()).getTime();
         let lastResetTimeStamp = this.getLastResetTimeStamp();
         let milliSecondDiff = currentTimeStamp - lastResetTimeStamp;
