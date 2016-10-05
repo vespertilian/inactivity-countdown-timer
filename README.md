@@ -15,6 +15,8 @@ Features
 
 By default the inactivity timeout is reset by these events: 
 
+- demo
+
 - clicks
 - mousemovement
 - keypresses
