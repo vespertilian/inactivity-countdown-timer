@@ -1,36 +1,13 @@
-# idle-countdown-timer
+# inactivity-countdown-timer
 
-A plain JS (Typescript) module that will countdown and timeout when users are idle. 
+###A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. 
 
 Can be used to transition away from sensitive on screen information and redirect to another page. 
 Useful when a user forgets to close their browser or tab before walking away from their computer.
 
-Features 
- - A count down - alert users you are going to transition them using the countDownCallback. 
- - Activity is synced across tabs using local storage (users won't be transitioned if they are active in any tab)
- - Dynamically adjusting timer. Which will set itself to the largest timeout time, then change to timeout every second for the countdown. 
- - Good browser support 
- - Written in typescript and bundled as a UMD module.
- - Tests with a saucelabs setup for cross browser testing
-
-By default the inactivity timeout is reset by these events: 
-
-- clicks
-- mousemovement
-- keypresses
-
-The timeout is synced across browser tabs via local storage. So being active in a second tab will not log you out of the first.
-
 ## Install 
 
-******** package name forthcoming placeholder: `npm install idle-countdown-timer --save`
-
-## Supports
-
- - IE8+ (you need to include the ie8EventListenerPolyfill)
- - Chrome
- - Firefox
- - Safari
+`npm install inactivity-countdown-timer --save`
 
 ## Usage
 
@@ -54,6 +31,28 @@ let IL = new InactivityLogout(settings);
 IL.cleanup(()
 
 ```
+
+###Features 
+
+ - A count down callback - **alert users you are going to transition them**. 
+ - Activity is **synced across tabs using local storage** (users won't be transitioned if they are active in any other tab)
+ - **Dynamically adjusting timer**. Which will set itself to initially timeout when the count down starts, then change to timeout every second for the countdown. 
+ - Configure what 'Activity' is by passing in you're own reset event list
+ - Written in typescript and bundled as a UMD module.
+ - Tests with a saucelabs setup for cross browser testing
+
+By default the inactivity timeout is reset by these events: 
+
+- clicks
+- mousemovement
+- keypresses
+
+## Supports
+
+ - IE8+ (you need to include the ie8EventListenerPolyfill)
+ - Chrome
+ - Firefox
+ - Safari
 
 **Make sure you cleanup the object before deleting**
 
