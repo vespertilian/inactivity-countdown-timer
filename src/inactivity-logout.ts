@@ -1,10 +1,11 @@
 export interface IInactivityConfigParams {
     idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
-    localStorageKey?: string;
+    resetEvents?: string[];
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
+    localStorageKey?: string;
     logoutHREF?: string;
 }
 
@@ -24,20 +25,22 @@ declare var document: IDocument;
 
 const defaultInactivityConfigParams: IInactivityConfigParams = {
     idleTimeoutTime: 10000,
-    localStorageKey: 'inactivity_logout_local_storage'
+    localStorageKey: 'inactivity_logout_local_storage',
+    resetEvents: ['click','mousemove','keypress']
 };
 
 // require('./ie8addEventListener');
 export class InactivityLogout {
-    private idleTimeoutTime: number;
     private timeoutTime: number;
-    private startCountDownTimerAt: number;
     private localStorageKey: string;
     private lastResetTimeStamp: number;
     private localStorage: Storage;
     private signOutHREF: string;
     private countingDown: boolean = false;
 
+    private idleTimeoutTime: number;
+    private startCountDownTimerAt: number;
+    private resetEvents: string[];
     private timeoutCallback: () => void;
     private countDownCallback: (secondsLeft: number) => void;
     private countDownCancelledCallback: () => void;
@@ -53,8 +56,8 @@ export class InactivityLogout {
         // how long you can be idle for before we time you out
         this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfigParams.idleTimeoutTime;
 
-        // if start count down timer is present make sure its a number and less than idleTimeoutTime
         if((typeof(params.startCountDownTimerAt)) === 'number'){
+            // if start count down timer is present make sure its a number and less than idleTimeoutTime
             if(params.startCountDownTimerAt > this.idleTimeoutTime) {
                 console.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
                 this.startCountDownTimerAt = this.idleTimeoutTime;
@@ -64,6 +67,7 @@ export class InactivityLogout {
                 this.timeoutTime = this.idleTimeoutTime - this.startCountDownTimerAt;
             }
         } else {
+            // don't use count down timer
             this.startCountDownTimerAt = 0;
             this.timeoutTime = this.idleTimeoutTime;
         }
@@ -72,11 +76,11 @@ export class InactivityLogout {
         this.countDownCallback = params.countDownCallback;
         this.countDownCancelledCallback = params.countDownCancelledCallback;
         this.localStorageKey = params.localStorageKey || defaultInactivityConfigParams.localStorageKey;
+        this.resetEvents = params.resetEvents || defaultInactivityConfigParams.resetEvents;
         this.signOutHREF = params.logoutHREF;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
-
         this.start();
 
     }
@@ -88,11 +92,10 @@ export class InactivityLogout {
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
         // see README.md for more on why we are passing 'this'
-        document.addEventListener('click', this, false);
-        document.addEventListener('mousemove', this, false);
-        document.addEventListener('keypress', this, false);
-        window.addEventListener('load', this, false); // effectively a no-op
-
+        for(let i=0; i < this.resetEvents.length; i++) {
+            document.addEventListener(this.resetEvents[i], this, false)
+        }
+        window.addEventListener('load', this, false); // start count down when window is loaded
         // this fixes a bug in ie11 where the local storage does not sync
         // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         window.addEventListener('storage', function() {}); // effectively a no-op
@@ -113,14 +116,11 @@ export class InactivityLogout {
      * it will not be garbage collected if you just delete it.
      */
     public cleanup(): void {
-        document.removeEventListener('click', this, false);
-        document.removeEventListener('mousemove', this, false);
-        document.removeEventListener('keypress', this, false);
-        window.removeEventListener('load', this, false); // effectively a no-op
-
-        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
-        // this fixes a bug in ie11 where the local storage does not sync
-        window.removeEventListener('storage', function() {}); // effectively a no-op
+        for(let i=0; i < this.resetEvents.length; i++) {
+            document.removeEventListener(this.resetEvents[i], this, false)
+        }
+        window.removeEventListener('load', this, false);
+        window.removeEventListener('storage', function() {});
         this.stop();
     }
 
