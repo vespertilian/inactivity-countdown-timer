@@ -39,6 +39,19 @@ describe('Inactivity logout -', () => {
     });
 
     // todo: test that cleanup removes the event listeners
+    describe('cleanup removing event listeners -', () => {
+        it('should remove event listeners when .cleanup is called', () => {
+            let documentRemoveEventSpy = spyOn(document, 'removeEventListener').and.callThrough();
+            let windowRemoveEventSpy = spyOn(window, 'removeEventListener').and.callThrough();
+            let IL = new InactivityLogout({resetEvents: ['click', 'mousemove']});
+            IL.cleanup();
+            ['click', 'mousemove'].forEach((event) => {
+                expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, IL, false);
+            });
+            expect(windowRemoveEventSpy).toHaveBeenCalledWith('load', IL, false);
+            IL = null;
+        })
+    });
 
     describe('timing out -', () => {
         it('should call the params.timeoutCallback if one was passed in', () => {
