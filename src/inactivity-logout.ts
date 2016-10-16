@@ -81,14 +81,7 @@ export class InactivityLogout {
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
-        this.start();
 
-    }
-
-    /**
-     * Starts the timer
-     */
-    public start(): void {
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
         // see README.md for more on why we are passing 'this'
@@ -99,6 +92,13 @@ export class InactivityLogout {
         // this fixes a bug in ie11 where the local storage does not sync
         // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         window.addEventListener('storage', function() {}); // effectively a no-op
+        this.start();
+    }
+
+    /**
+     * Starts the timer
+     */
+    public start(): void {
         this.setLastResetTimeStamp((new Date()).getTime());
         this.startPrivate(this.timeoutTime)
     }
