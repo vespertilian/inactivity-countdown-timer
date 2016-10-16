@@ -133,7 +133,6 @@ export class InactivityLogout {
     }
 
     private startPrivate(precision: number) {
-        // console.log('start timer with precision: ', precision);
         this.currentTimerPrecision = precision;
         this.idleTimeoutID = window.setInterval(() => {
             this.checkIdleTime();
@@ -191,12 +190,12 @@ export class InactivityLogout {
             }
         }
         else {
-            // don't change if it's already the timeoutTime
-            if(this.currentTimerPrecision !== this.timeoutTime){
-               // we are now one second behind
-               // as we would have been counting down
-               this.resetTimer(this.timeoutTime - 1000)
-            }
+            // the js timer can be out by milliseconds, we need to set the timer to:
+            // the time remaining - when we start the count down timer
+            // eg 15 sec timeout, 10 sec countdown, time remaining 14345 secs
+            // timeout should be 4345 secs
+            let nextTimeoutWhen = timeRemaining - this.startCountDownTimerAt;
+            this.resetTimer(nextTimeoutWhen);
         }
     }
 
