@@ -13,14 +13,15 @@ Useful when a user forgets to close their browser or tab before walking away fro
 
 ```js
 // Optional config vars
-{
+let settings = {
     idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
-    localStorageKey?: string;
+    resetEvents?: string[];
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
-    ***** changeParamName logoutHREF?: string;
+    localStorageKey?: string;
+    logoutHREF?: string;
 }
 
 // Instantiate new logout object
@@ -28,9 +29,11 @@ let IL = new InactivityLogout(settings);
 
 // make sure you cleanup the object when you are finished using it.
 // will not be garbage collected unless you clean it up because of the timers
-IL.cleanup(()
-
+IL.cleanup()
 ```
+**Make sure you cleanup the object before deleting**
+
+[See the demo code for a more detailed example](https://github.com/Benefex/inactivity-countdown-timer/blob/master/src/demo.ts) 
 
 ###Features 
 
@@ -53,9 +56,6 @@ By default the inactivity timeout is reset by these events:
  - Chrome
  - Firefox
  - Safari
-
-**Make sure you cleanup the object before deleting**
-
 
 ## Development
 
@@ -146,3 +146,4 @@ var Something = function(element) {
 ```
 
 Read the full document ont [EventTarget.addEventListener()] on MDN
+
