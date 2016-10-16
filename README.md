@@ -35,7 +35,7 @@ IL.cleanup()
 
 [See the demo code for a more detailed example](https://github.com/Benefex/inactivity-countdown-timer/blob/master/src/demo.ts) 
 
-###Features 
+##Features 
 
  - A count down callback - **alert users you are going to transition them**. 
  - Activity is **synced across tabs using local storage** (users won't be transitioned if they are active in any other tab)
