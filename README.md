@@ -1,17 +1,17 @@
-# A vanilla JS library to fire a callback or redirect to a url after a specified time
+# idle-countdown-timer
 
-This is a plain JS (Typescript) module that will fire a callback you provide, or redirect to a url you provide. After a specified time of inactivity. 
+A plain JS (Typescript) module that will countdown and timeout when users are idle. 
 
-Can be used to transition away from sensitive on screen information and redirect to another page (logout or other page). 
+Can be used to transition away from sensitive on screen information and redirect to another page. 
 Useful when a user forgets to close their browser or tab before walking away from their computer.
 
 Features 
- - Written in typescript and bundled as a UMD module.
- - A countDownCallback with the time-remaining you can use to alert users they are going to be logged out.
- - A countDownCancelled callback. So you can stop showing time remaining.
- - A timeoutCallback.
+ - A count down - alert users you are going to transition them using the countDownCallback. 
+ - Activity is synced across tabs using local storage (users won't be transitioned if they are active in any tab)
  - Dynamically adjusting timer. Which will set itself to the largest timeout time, then change to timeout every second for the countdown. 
- - Syncs across tabs using local storaget 
+ - Good browser support 
+ - Written in typescript and bundled as a UMD module.
+ - Tests with a saucelabs setup for cross browser testing
 
 By default the inactivity timeout is reset by these events: 
 
@@ -23,7 +23,7 @@ The timeout is synced across browser tabs via local storage. So being active in 
 
 ## Install 
 
-******** package name forthcoming placeholder: `npm install inactivity-logout --save`
+******** package name forthcoming placeholder: `npm install idle-countdown-timer --save`
 
 ## Supports
 

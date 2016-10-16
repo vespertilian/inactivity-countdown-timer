@@ -92,8 +92,9 @@ export class InactivityLogout {
         document.addEventListener('mousemove', this, false);
         document.addEventListener('keypress', this, false);
         window.addEventListener('load', this, false); // effectively a no-op
-        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
+
         // this fixes a bug in ie11 where the local storage does not sync
+        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         window.addEventListener('storage', function() {}); // effectively a no-op
         this.setLastResetTimeStamp((new Date()).getTime());
         this.startPrivate(this.timeoutTime)
