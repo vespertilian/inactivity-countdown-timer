@@ -1,51 +1,27 @@
-# A vanilla JS library to fire a callback or redirect to a url after a specified time
+# inactivity-countdown-timer
 
-This is a plain JS (Typescript) module that will fire a callback you provide, or redirect to a url you provide. After a specified time of inactivity. 
+###A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. 
 
-Can be used to transition away from sensitive on screen information and redirect to another page (logout or other page). 
+Can be used to transition away from sensitive on screen information and redirect to another page. 
 Useful when a user forgets to close their browser or tab before walking away from their computer.
-
-Features 
- - Written in typescript and bundled as a UMD module.
- - A countDownCallback with the time-remaining you can use to alert users they are going to be logged out.
- - A countDownCancelled callback. So you can stop showing time remaining.
- - A timeoutCallback.
- - Dynamically adjusting timer. Which will set itself to the largest timeout time, then change to timeout every second for the countdown. 
- - Syncs across tabs using local storaget 
-
-By default the inactivity timeout is reset by these events: 
-
-- demo
-
-- clicks
-- mousemovement
-- keypresses
-
-The timeout is synced across browser tabs via local storage. So being active in a second tab will not log you out of the first.
 
 ## Install 
 
-******** package name forthcoming placeholder: `npm install inactivity-logout --save`
-
-## Supports
-
- - IE8+ (you need to include the ie8EventListenerPolyfill)
- - Chrome
- - Firefox
- - Safari
+`npm install inactivity-countdown-timer --save`
 
 ## Usage
 
 ```js
 // Optional config vars
-{
+let settings = {
     idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
-    localStorageKey?: string;
+    resetEvents?: string[];
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
-    ***** changeParamName logoutHREF?: string;
+    localStorageKey?: string;
+    logoutHREF?: string;
 }
 
 // Instantiate new logout object
@@ -53,12 +29,33 @@ let IL = new InactivityLogout(settings);
 
 // make sure you cleanup the object when you are finished using it.
 // will not be garbage collected unless you clean it up because of the timers
-IL.cleanup(()
-
+IL.cleanup()
 ```
-
 **Make sure you cleanup the object before deleting**
 
+[See the demo code for a more detailed example](https://github.com/Benefex/inactivity-countdown-timer/blob/master/src/demo.ts) 
+
+##Features 
+
+ - A count down callback - **alert users you are going to transition them**. 
+ - Activity is **synced across tabs using local storage** (users won't be transitioned if they are active in any other tab)
+ - **Dynamically adjusting timer**. Which will set itself to initially timeout when the count down starts, then change to timeout every second for the countdown. 
+ - Configure what 'Activity' is by passing in you're own reset event list
+ - Written in typescript and bundled as a UMD module.
+ - Tests with a saucelabs setup for cross browser testing
+
+By default the inactivity timeout is reset by these events: 
+
+- clicks
+- mousemovement
+- keypresses
+
+## Supports
+
+ - IE8+ (you need to include the ie8EventListenerPolyfill)
+ - Chrome
+ - Firefox
+ - Safari
 
 ## Development
 
@@ -149,3 +146,4 @@ var Something = function(element) {
 ```
 
 Read the full document ont [EventTarget.addEventListener()] on MDN
+

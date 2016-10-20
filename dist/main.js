@@ -68,73 +68,103 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var defaultInactivityConfigParams = {
 	    idleTimeoutTime: 10000,
-	    timeoutPrecision: 1000,
-	    localStorageKey: 'inactivity_logout_local_storage'
+	    localStorageKey: 'inactivity_logout_local_storage',
+	    resetEvents: ['click', 'mousemove', 'keypress']
 	};
 	// require('./ie8addEventListener');
 	var InactivityLogout = (function () {
+	    /**
+	     * @param params
+	     * - **idleTimeoutTime**: 10000 - ms / 10 seconds
+	     * - **localStorageKey**: 'inactivity_logout_local_storage'
+	     */
 	    function InactivityLogout(params) {
 	        if (params === void 0) { params = defaultInactivityConfigParams; }
 	        this.params = params;
-	        this.lastResetTimeStamp = (new Date()).getTime();
 	        this.countingDown = false;
 	        // config var defaults
 	        // how long you can be idle for before we time you out
-	        this.idleTimeoutTime = params.idleTimeoutTime || 10000;
+	        this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfigParams.idleTimeoutTime;
 	        if ((typeof (params.startCountDownTimerAt)) === 'number') {
+	            // if start count down timer is present make sure its a number and less than idleTimeoutTime
 	            if (params.startCountDownTimerAt > this.idleTimeoutTime) {
 	                console.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
 	                this.startCountDownTimerAt = this.idleTimeoutTime;
+	                this.timeoutTime = 1000; // start the countdown
 	            }
 	            else {
 	                this.startCountDownTimerAt = params.startCountDownTimerAt;
+	                this.timeoutTime = this.idleTimeoutTime - this.startCountDownTimerAt;
 	            }
+	        }
+	        else {
+	            // don't use count down timer
+	            this.startCountDownTimerAt = 0;
+	            this.timeoutTime = this.idleTimeoutTime;
 	        }
 	        this.timeoutCallback = params.timeoutCallback;
 	        this.countDownCallback = params.countDownCallback;
 	        this.countDownCancelledCallback = params.countDownCancelledCallback;
-	        this.localStorageKey = params.localStorageKey || 'inactivity_logout_local_storage';
+	        this.localStorageKey = params.localStorageKey || defaultInactivityConfigParams.localStorageKey;
+	        this.resetEvents = params.resetEvents || defaultInactivityConfigParams.resetEvents;
 	        this.signOutHREF = params.logoutHREF;
-	        this.timeoutPrecision = params.timeoutPrecision || 1000;
 	        // setup local storage
 	        this.localStorage = this.detectAndAssignLocalStorage();
-	        this.start(this.timeoutPrecision);
 	        // attach events that will rest the timers
 	        // this ends up calling the this.handleEvent function
-	        // see README.md for more on why we are passing this
-	        document.addEventListener('click', this, false);
-	        document.addEventListener('mousemove', this, false);
-	        document.addEventListener('keypress', this, false);
-	        window.addEventListener('load', this, false); // effectively a no-op
-	        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
+	        // see README.md for more on why we are passing 'this'
+	        for (var i = 0; i < this.resetEvents.length; i++) {
+	            document.addEventListener(this.resetEvents[i], this, false);
+	        }
+	        window.addEventListener('load', this, false); // start count down when window is loaded
 	        // this fixes a bug in ie11 where the local storage does not sync
+	        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
 	        window.addEventListener('storage', function () { }); // effectively a no-op
+	        this.start();
 	    }
-	    InactivityLogout.prototype.start = function (precision) {
+	    /**
+	     * Starts the timer
+	     */
+	    InactivityLogout.prototype.start = function () {
+	        this.setLastResetTimeStamp((new Date()).getTime());
+	        this.startPrivate(this.timeoutTime);
+	    };
+	    /**
+	     * Clears the timer
+	     */
+	    InactivityLogout.prototype.stop = function () {
+	        window.clearInterval(this.idleTimeoutID);
+	    };
+	    /**
+	     * **You must call cleanup** before you delete the object.
+	     * As the timer in the class is calling a method on itself
+	     * it will not be garbage collected if you just delete it.
+	     */
+	    InactivityLogout.prototype.cleanup = function () {
+	        for (var i = 0; i < this.resetEvents.length; i++) {
+	            document.removeEventListener(this.resetEvents[i], this, false);
+	        }
+	        window.removeEventListener('load', this, false);
+	        window.removeEventListener('storage', function () { });
+	        this.stop();
+	    };
+	    // see readme about why we use handleEvent
+	    InactivityLogout.prototype.handleEvent = function (eventName) {
+	        // we don't need to do anything with the eventName
+	        // as we want all events to fire the same actions
+	        var currentTime = (new Date).getTime();
+	        this.setLastResetTimeStamp(currentTime);
+	    };
+	    InactivityLogout.prototype.startPrivate = function (precision) {
 	        var _this = this;
 	        this.currentTimerPrecision = precision;
-	        this.setLastResetTimeStamp((new Date()).getTime());
 	        this.idleTimeoutID = window.setInterval(function () {
 	            _this.checkIdleTime();
 	        }, precision);
 	    };
-	    InactivityLogout.prototype.stop = function () {
-	        window.clearInterval(this.idleTimeoutID);
-	    };
-	    InactivityLogout.prototype.cleanup = function () {
-	        document.removeEventListener('click', this, false);
-	        document.removeEventListener('mousemove', this, false);
-	        document.removeEventListener('keypress', this, false);
-	        window.removeEventListener('load', this, false); // effectively a no-op
-	        //https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
-	        // this fixes a bug in ie11 where the local storage does not sync
-	        window.removeEventListener('storage', function () { }); // effectively a no-op
+	    InactivityLogout.prototype.resetTimer = function (precision) {
 	        this.stop();
-	    };
-	    // see readme about why we use handleEvent
-	    InactivityLogout.prototype.handleEvent = function () {
-	        var currentTime = (new Date).getTime();
-	        this.setLastResetTimeStamp(currentTime);
+	        this.startPrivate(precision);
 	    };
 	    InactivityLogout.prototype.timeout = function () {
 	        this.cleanup();
@@ -157,32 +187,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    InactivityLogout.prototype.handleCountDown = function (timeRemaining) {
-	        if (this.countDownCallback && (timeRemaining <= this.startCountDownTimerAt)) {
+	        var inCountDownTimeFrame = (timeRemaining <= this.startCountDownTimerAt);
+	        if (inCountDownTimeFrame && this.countDownCallback) {
 	            this.countingDown = true;
 	            this.countDownCallback(Math.abs(Math.ceil(timeRemaining / 1000)));
 	        }
-	        else if (this.countingDown) {
-	            // if we are already counting down
-	            // alert we no longer are
-	            this.countDownCancelledCallback();
+	        else if (!inCountDownTimeFrame && this.countingDown) {
+	            if (this.countDownCancelledCallback) {
+	                this.countDownCancelledCallback();
+	            }
 	            this.countingDown = false;
 	        }
 	    };
 	    InactivityLogout.prototype.checkTimerPrecision = function (timeRemaining) {
 	        // when we are counting down we want to
 	        // increase the interval precision to seconds
-	        var increasePrecisionTime = this.startCountDownTimerAt + this.timeoutPrecision;
-	        if (timeRemaining < increasePrecisionTime) {
+	        if (timeRemaining <= this.startCountDownTimerAt) {
+	            // don't change if it's already seconds
 	            if (this.currentTimerPrecision !== 1000) {
-	                this.stop();
-	                this.start(1000);
+	                this.resetTimer(1000);
 	            }
 	        }
 	        else {
-	            if (this.currentTimerPrecision !== this.timeoutPrecision) {
-	                this.stop();
-	                this.start(this.timeoutPrecision);
-	            }
+	            // the js timer can be out by milliseconds, we need to set the timer to:
+	            // the time remaining - when we start the count down timer
+	            // eg 15 sec timeout, 10 sec countdown, time remaining 14345 secs
+	            // timeout should be 4345 secs
+	            var nextTimeoutWhen = timeRemaining - this.startCountDownTimerAt;
+	            this.resetTimer(nextTimeoutWhen);
 	        }
 	    };
 	    InactivityLogout.prototype.getLastResetTimeStamp = function () {
@@ -226,7 +258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return result && storage;
 	        }
 	        catch (exception) {
-	            console.log('LOCAL STORAGE IS NOT AVALIABLE FOR SYNCING TIMEOUT ACROSS TABS', exception);
+	            console.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception);
 	        }
 	    };
 	    // cannot mock location changes

@@ -13,7 +13,7 @@ describe('Inactivity logout -', () => {
             expect(log).toHaveBeenCalledWith('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime')
         });
 
-        it('should attach event handlers to document.click, document.mousemove, document.keypress, window.load', () => {
+        it('should attach event handlers to document.click, document.mousemove, document.keypress, window.load when none are passed in', () => {
             let documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
             let IL = new InactivityLogout();
@@ -25,8 +25,32 @@ describe('Inactivity logout -', () => {
             IL = null;
         });
 
-        // todo: test that cleanup removes the event listeners
+        it('should attach custom event handlers to document and window when they are passed in', () => {
+            let documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
+            let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
+            let IL = new InactivityLogout({resetEvents: ['scroll','dblclick']});
+            ['scroll', 'dblclick'].forEach((event) => {
+                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL, false);
+            });
+            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL, false);
+            IL.cleanup();
+            IL = null;
+        });
+    });
 
+    // todo: test that cleanup removes the event listeners
+    describe('cleanup removing event listeners -', () => {
+        it('should remove event listeners when .cleanup is called', () => {
+            let documentRemoveEventSpy = spyOn(document, 'removeEventListener').and.callThrough();
+            let windowRemoveEventSpy = spyOn(window, 'removeEventListener').and.callThrough();
+            let IL = new InactivityLogout({resetEvents: ['click', 'mousemove']});
+            IL.cleanup();
+            ['click', 'mousemove'].forEach((event) => {
+                expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, IL, false);
+            });
+            expect(windowRemoveEventSpy).toHaveBeenCalledWith('load', IL, false);
+            IL = null;
+        })
     });
 
     describe('timing out -', () => {

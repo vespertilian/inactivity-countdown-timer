@@ -1,9 +1,10 @@
 {
-  "name": "inactivity-logout",
+  "name": "inactivity-countdown-timer",
   "version": "1.0.0-beta-0",
-  "description": "A vanilla JS library to automatically logout users after a specified time",
+  "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. ",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
+  "keywords": ["inactivity", "inactive", "countdown", "timer", "idle"],
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
     "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
@@ -16,7 +17,15 @@
     "typings": "typings",
     "typedoc": "typedoc"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Benefex/inactivity-countdown-timer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Benefex/inactivity-countdown-timer/issues"
+  },
+  "homepage": "https://github.com/Benefex/inactivity-countdown-timer",
+  "author": "Benefex",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
