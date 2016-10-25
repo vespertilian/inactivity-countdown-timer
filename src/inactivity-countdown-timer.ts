@@ -1,4 +1,4 @@
-export interface IInactivityConfigParams {
+export interface IInactivityConfig {
     idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
     resetEvents?: string[];
@@ -23,14 +23,14 @@ interface IDocument extends Document {
 
 declare var document: IDocument;
 
-const defaultInactivityConfigParams: IInactivityConfigParams = {
+const defaultInactivityConfig: IInactivityConfig = {
     idleTimeoutTime: 10000,
     localStorageKey: 'inactivity_logout_local_storage',
     resetEvents: ['click','mousemove','keypress']
 };
 
 // require('./ie8addEventListener');
-export class InactivityLogout {
+export class InactivityCountdownTimer {
     private timeoutTime: number;
     private localStorageKey: string;
     private lastResetTimeStamp: number;
@@ -51,10 +51,10 @@ export class InactivityLogout {
      * - **idleTimeoutTime**: 10000 - ms / 10 seconds
      * - **localStorageKey**: 'inactivity_logout_local_storage'
      */
-    constructor(private params: IInactivityConfigParams = defaultInactivityConfigParams) {
+    constructor(private params: IInactivityConfig = defaultInactivityConfig) {
         // config var defaults
         // how long you can be idle for before we time you out
-        this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfigParams.idleTimeoutTime;
+        this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfig.idleTimeoutTime;
 
         if((typeof(params.startCountDownTimerAt)) === 'number'){
             // if start count down timer is present make sure its a number and less than idleTimeoutTime
@@ -75,8 +75,8 @@ export class InactivityLogout {
         this.timeoutCallback = params.timeoutCallback;
         this.countDownCallback = params.countDownCallback;
         this.countDownCancelledCallback = params.countDownCancelledCallback;
-        this.localStorageKey = params.localStorageKey || defaultInactivityConfigParams.localStorageKey;
-        this.resetEvents = params.resetEvents || defaultInactivityConfigParams.resetEvents;
+        this.localStorageKey = params.localStorageKey || defaultInactivityConfig.localStorageKey;
+        this.resetEvents = params.resetEvents || defaultInactivityConfig.resetEvents;
         this.signOutHREF = params.logoutHREF;
 
         // setup local storage

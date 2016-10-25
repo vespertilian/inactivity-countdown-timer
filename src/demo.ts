@@ -5,8 +5,8 @@
     }
 })();
 
-import {InactivityLogout} from './inactivity-logout'
-import {IInactivityConfigParams} from '../src/inactivity-logout'
+import {InactivityCountdownTimer} from './inactivity-countdown-timer'
+import {IInactivityConfig} from 'inactivity-countdown-timer.ts'
 
 declare var ON_DEV: boolean;
 if(ON_DEV){
@@ -27,14 +27,14 @@ if(ON_DEV){
             updateElement.innerHTML = 'CountDown cancelled'
         }
 
-        let settings: IInactivityConfigParams = {
+        let settings: IInactivityConfig = {
             idleTimeoutTime: 15000,
             startCountDownTimerAt: 10000,
             timeoutCallback: timeoutCallback,
             countDownCallback: countDownCallback,
             countDownCancelledCallback: countDownCancelledCallback
         };
-        new InactivityLogout(settings)
+        new InactivityCountdownTimer(settings)
     });
 }
 

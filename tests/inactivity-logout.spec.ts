@@ -1,13 +1,12 @@
+import {InactivityCountdownTimer, IInactivityConfig} from "../src/inactivity-countdown-timer";
 require('./ie8forEachPolyfill'); // because we use forEach in this test
-import {InactivityLogout} from '../src/inactivity-logout'
-import {IInactivityConfigParams} from '../src/inactivity-logout'
 // need to install jasmine clock and mock the date for testing
 describe('Inactivity logout -', () => {
 
     describe('construction', () => {
         it('should log to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
             let log = spyOn(window.console, 'log');
-            let IL = new InactivityLogout({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
+            let IL = new InactivityCountdownTimer({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
             IL.cleanup();
             IL = null;
             expect(log).toHaveBeenCalledWith('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime')
@@ -16,7 +15,7 @@ describe('Inactivity logout -', () => {
         it('should attach event handlers to document.click, document.mousemove, document.keypress, window.load when none are passed in', () => {
             let documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
-            let IL = new InactivityLogout();
+            let IL = new InactivityCountdownTimer();
             ['click', 'mousemove', 'keypress'].forEach((event) => {
                 expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL, false);
             });
@@ -28,7 +27,7 @@ describe('Inactivity logout -', () => {
         it('should attach custom event handlers to document and window when they are passed in', () => {
             let documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
-            let IL = new InactivityLogout({resetEvents: ['scroll','dblclick']});
+            let IL = new InactivityCountdownTimer({resetEvents: ['scroll','dblclick']});
             ['scroll', 'dblclick'].forEach((event) => {
                 expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL, false);
             });
@@ -43,7 +42,7 @@ describe('Inactivity logout -', () => {
         it('should remove event listeners when .cleanup is called', () => {
             let documentRemoveEventSpy = spyOn(document, 'removeEventListener').and.callThrough();
             let windowRemoveEventSpy = spyOn(window, 'removeEventListener').and.callThrough();
-            let IL = new InactivityLogout({resetEvents: ['click', 'mousemove']});
+            let IL = new InactivityCountdownTimer({resetEvents: ['click', 'mousemove']});
             IL.cleanup();
             ['click', 'mousemove'].forEach((event) => {
                 expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, IL, false);
@@ -112,7 +111,7 @@ describe('Inactivity logout -', () => {
     describe('counting down - ', () => {
         it('should call the params.countDownCallback when the time reaches the startCountdownTimerAt value', () => {
             let callback = jasmine.createSpy('callback');
-            let settings: IInactivityConfigParams = {
+            let settings: IInactivityConfig = {
                 idleTimeoutTime: 20000,
                 startCountDownTimerAt: 10000,
                 countDownCallback: callback
@@ -135,7 +134,7 @@ describe('Inactivity logout -', () => {
         it('should call the params.countDownCancelledCallback when the countdown is aborted', () => {
             let countDownCallback = jasmine.createSpy('countDownCallback');
             let countDownCancelledCallback = jasmine.createSpy('countDownCancelledCallback');
-            let settings: IInactivityConfigParams = {
+            let settings: IInactivityConfig = {
                 idleTimeoutTime: 20000,
                 startCountDownTimerAt: 10000,
                 countDownCallback: countDownCallback,
@@ -159,7 +158,7 @@ describe('Inactivity logout -', () => {
     describe('timeoutPrecision', () => {
         it('should dynamically adjust the timeout precision', () => {
             let countDownCallback = jasmine.createSpy('countDownCallback');
-            let settings: IInactivityConfigParams = {
+            let settings: IInactivityConfig = {
                 idleTimeoutTime: 1000 * 60 * 5, // 5 minutes
                 startCountDownTimerAt: 1000 * 30, // 30 seconds
                 countDownCallback: countDownCallback
@@ -212,13 +211,13 @@ describe('Inactivity logout -', () => {
 
 });
 
-function setupWithClock(params: IInactivityConfigParams): InactivityLogout {
+function setupWithClock(params: IInactivityConfig): InactivityCountdownTimer {
     jasmine.clock().install();
     jasmine.clock().mockDate();
-    return new InactivityLogout(params);
+    return new InactivityCountdownTimer(params);
 }
 
-function cleanupWithClock(IL: InactivityLogout): void {
+function cleanupWithClock(IL: InactivityCountdownTimer): void {
     IL.cleanup();
     IL = null;
     jasmine.clock().uninstall();

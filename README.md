@@ -31,9 +31,8 @@ let IL = new InactivityLogout(settings);
 // will not be garbage collected unless you clean it up because of the timers
 IL.cleanup()
 ```
-**Make sure you cleanup the object before deleting**
 
-[See the demo code for a more detailed example](https://github.com/Benefex/inactivity-countdown-timer/blob/master/src/demo.ts) 
+[See the demo code for a detailed example](https://github.com/Benefex/inactivity-countdown-timer/blob/master/src/demo.ts) 
 
 ##Features 
 

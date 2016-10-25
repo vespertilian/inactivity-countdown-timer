@@ -55,8 +55,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var inactivity_logout_1 = __webpack_require__(1);
-	exports.InactivityLogout = inactivity_logout_1.InactivityLogout;
+	var inactivity_countdown_timer_1 = __webpack_require__(1);
+	exports.InactivityCountdownTimer = inactivity_countdown_timer_1.InactivityCountdownTimer;
 	var ie8EventListenerPolyfill_1 = __webpack_require__(2);
 	exports.ie8EventListenerPolyfill = ie8EventListenerPolyfill_1.ie8EventListenerPolyfill;
 
@@ -66,25 +66,25 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
-	var defaultInactivityConfigParams = {
+	var defaultInactivityConfig = {
 	    idleTimeoutTime: 10000,
 	    localStorageKey: 'inactivity_logout_local_storage',
 	    resetEvents: ['click', 'mousemove', 'keypress']
 	};
 	// require('./ie8addEventListener');
-	var InactivityLogout = (function () {
+	var InactivityCountdownTimer = (function () {
 	    /**
 	     * @param params
 	     * - **idleTimeoutTime**: 10000 - ms / 10 seconds
 	     * - **localStorageKey**: 'inactivity_logout_local_storage'
 	     */
-	    function InactivityLogout(params) {
-	        if (params === void 0) { params = defaultInactivityConfigParams; }
+	    function InactivityCountdownTimer(params) {
+	        if (params === void 0) { params = defaultInactivityConfig; }
 	        this.params = params;
 	        this.countingDown = false;
 	        // config var defaults
 	        // how long you can be idle for before we time you out
-	        this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfigParams.idleTimeoutTime;
+	        this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfig.idleTimeoutTime;
 	        if ((typeof (params.startCountDownTimerAt)) === 'number') {
 	            // if start count down timer is present make sure its a number and less than idleTimeoutTime
 	            if (params.startCountDownTimerAt > this.idleTimeoutTime) {
@@ -105,8 +105,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.timeoutCallback = params.timeoutCallback;
 	        this.countDownCallback = params.countDownCallback;
 	        this.countDownCancelledCallback = params.countDownCancelledCallback;
-	        this.localStorageKey = params.localStorageKey || defaultInactivityConfigParams.localStorageKey;
-	        this.resetEvents = params.resetEvents || defaultInactivityConfigParams.resetEvents;
+	        this.localStorageKey = params.localStorageKey || defaultInactivityConfig.localStorageKey;
+	        this.resetEvents = params.resetEvents || defaultInactivityConfig.resetEvents;
 	        this.signOutHREF = params.logoutHREF;
 	        // setup local storage
 	        this.localStorage = this.detectAndAssignLocalStorage();
@@ -125,14 +125,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Starts the timer
 	     */
-	    InactivityLogout.prototype.start = function () {
+	    InactivityCountdownTimer.prototype.start = function () {
 	        this.setLastResetTimeStamp((new Date()).getTime());
 	        this.startPrivate(this.timeoutTime);
 	    };
 	    /**
 	     * Clears the timer
 	     */
-	    InactivityLogout.prototype.stop = function () {
+	    InactivityCountdownTimer.prototype.stop = function () {
 	        window.clearInterval(this.idleTimeoutID);
 	    };
 	    /**
@@ -140,7 +140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * As the timer in the class is calling a method on itself
 	     * it will not be garbage collected if you just delete it.
 	     */
-	    InactivityLogout.prototype.cleanup = function () {
+	    InactivityCountdownTimer.prototype.cleanup = function () {
 	        for (var i = 0; i < this.resetEvents.length; i++) {
 	            document.removeEventListener(this.resetEvents[i], this, false);
 	        }
@@ -149,24 +149,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.stop();
 	    };
 	    // see readme about why we use handleEvent
-	    InactivityLogout.prototype.handleEvent = function (eventName) {
+	    InactivityCountdownTimer.prototype.handleEvent = function (eventName) {
 	        // we don't need to do anything with the eventName
 	        // as we want all events to fire the same actions
 	        var currentTime = (new Date).getTime();
 	        this.setLastResetTimeStamp(currentTime);
 	    };
-	    InactivityLogout.prototype.startPrivate = function (precision) {
+	    InactivityCountdownTimer.prototype.startPrivate = function (precision) {
 	        var _this = this;
 	        this.currentTimerPrecision = precision;
 	        this.idleTimeoutID = window.setInterval(function () {
 	            _this.checkIdleTime();
 	        }, precision);
 	    };
-	    InactivityLogout.prototype.resetTimer = function (precision) {
+	    InactivityCountdownTimer.prototype.resetTimer = function (precision) {
 	        this.stop();
 	        this.startPrivate(precision);
 	    };
-	    InactivityLogout.prototype.timeout = function () {
+	    InactivityCountdownTimer.prototype.timeout = function () {
 	        this.cleanup();
 	        if (this.timeoutCallback) {
 	            this.timeoutCallback();
@@ -175,7 +175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.redirect(this.signOutHREF);
 	        }
 	    };
-	    InactivityLogout.prototype.checkIdleTime = function () {
+	    InactivityCountdownTimer.prototype.checkIdleTime = function () {
 	        var currentTimeStamp = (new Date()).getTime();
 	        var lastResetTimeStamp = this.getLastResetTimeStamp();
 	        var milliSecondDiff = currentTimeStamp - lastResetTimeStamp;
@@ -186,7 +186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.timeout();
 	        }
 	    };
-	    InactivityLogout.prototype.handleCountDown = function (timeRemaining) {
+	    InactivityCountdownTimer.prototype.handleCountDown = function (timeRemaining) {
 	        var inCountDownTimeFrame = (timeRemaining <= this.startCountDownTimerAt);
 	        if (inCountDownTimeFrame && this.countDownCallback) {
 	            this.countingDown = true;
@@ -199,7 +199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.countingDown = false;
 	        }
 	    };
-	    InactivityLogout.prototype.checkTimerPrecision = function (timeRemaining) {
+	    InactivityCountdownTimer.prototype.checkTimerPrecision = function (timeRemaining) {
 	        // when we are counting down we want to
 	        // increase the interval precision to seconds
 	        if (timeRemaining <= this.startCountDownTimerAt) {
@@ -217,7 +217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.resetTimer(nextTimeoutWhen);
 	        }
 	    };
-	    InactivityLogout.prototype.getLastResetTimeStamp = function () {
+	    InactivityCountdownTimer.prototype.getLastResetTimeStamp = function () {
 	        var lastResetTimeStamp;
 	        if (this.localStorage) {
 	            var lastResetTimeStampString = void 0;
@@ -234,7 +234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return lastResetTimeStamp;
 	    };
-	    InactivityLogout.prototype.setLastResetTimeStamp = function (timestamp) {
+	    InactivityCountdownTimer.prototype.setLastResetTimeStamp = function (timestamp) {
 	        if (this.localStorage) {
 	            try {
 	                this.localStorage.setItem(this.localStorageKey, timestamp.toString());
@@ -247,7 +247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.lastResetTimeStamp = timestamp;
 	        }
 	    };
-	    InactivityLogout.prototype.detectAndAssignLocalStorage = function () {
+	    InactivityCountdownTimer.prototype.detectAndAssignLocalStorage = function () {
 	        var uid = (new Date()).getTime().toString() + 'detectAndAssignLocalStorage';
 	        var storage = localStorage;
 	        var result;
@@ -263,14 +263,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // cannot mock location changes
 	    // so little function allows us to verify redirect is called
-	    InactivityLogout.prototype.redirect = function (url) {
+	    InactivityCountdownTimer.prototype.redirect = function (url) {
 	        if (url) {
 	            window.location.href = url;
 	        }
 	    };
-	    return InactivityLogout;
+	    return InactivityCountdownTimer;
 	}());
-	exports.InactivityLogout = InactivityLogout;
+	exports.InactivityCountdownTimer = InactivityCountdownTimer;
 
 
 /***/ },
