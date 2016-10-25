@@ -34,6 +34,8 @@ IL.cleanup()
 
 [See the demo code for a detailed example](https://github.com/Benefex/inactivity-countdown-timer/blob/master/src/demo.ts) 
 
+run `npm start` to view the demo locally
+
 ##Features 
 
  - A count down callback - **alert users you are going to transition them**. 
@@ -64,11 +66,12 @@ The project is setup with both main.ts used for exporting the library and a demo
 `npm install` installs node modules and runs tests
 
 ### NPM Tasks
-`npm start` runs a development server
-`npm test` runs the tests via karma (from the main ts file) 
-`npm test-via-saucelabs` runs the tests via karma against Saucelabs config(from the main ts file) 
-`npm build` builds a version for distribution via npm
-`npm prepublish` used when publishing to npm
+
+- `npm start` runs a development server
+- `npm test` runs the tests via karma (from the main ts file) 
+- `npm test-via-saucelabs` runs the tests via karma against Saucelabs config(from the main ts file) 
+- `npm build` builds a version for distribution via npm
+- `npm prepublish` used when publishing to npm
 
 ### Publishing workflow
 1. Run tests `npm test`
