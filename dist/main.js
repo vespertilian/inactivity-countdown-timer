@@ -107,7 +107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.countDownCancelledCallback = params.countDownCancelledCallback;
 	        this.localStorageKey = params.localStorageKey || defaultInactivityConfig.localStorageKey;
 	        this.resetEvents = params.resetEvents || defaultInactivityConfig.resetEvents;
-	        this.signOutHREF = params.logoutHREF;
+	        this.signOutHREF = params.redirectHREF;
 	        // setup local storage
 	        this.localStorage = this.detectAndAssignLocalStorage();
 	        // attach events that will rest the timers

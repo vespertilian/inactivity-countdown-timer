@@ -21,7 +21,7 @@ let settings = {
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
     localStorageKey?: string;
-    logoutHREF?: string;
+    redirectHREF?: string;
 }
 
 // Instantiate new logout object

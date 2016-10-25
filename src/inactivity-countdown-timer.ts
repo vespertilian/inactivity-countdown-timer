@@ -6,7 +6,7 @@ export interface IInactivityConfig {
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
     localStorageKey?: string;
-    logoutHREF?: string;
+    redirectHREF?: string;
 }
 
 interface IWindow extends Window {
@@ -35,7 +35,7 @@ export class InactivityCountdownTimer {
     private localStorageKey: string;
     private lastResetTimeStamp: number;
     private localStorage: Storage;
-    private signOutHREF: string;
+    private redirectHREF: string;
     private countingDown: boolean = false;
 
     private idleTimeoutTime: number;
@@ -77,7 +77,7 @@ export class InactivityCountdownTimer {
         this.countDownCancelledCallback = params.countDownCancelledCallback;
         this.localStorageKey = params.localStorageKey || defaultInactivityConfig.localStorageKey;
         this.resetEvents = params.resetEvents || defaultInactivityConfig.resetEvents;
-        this.signOutHREF = params.logoutHREF;
+        this.redirectHREF = params.redirectHREF;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
@@ -149,8 +149,8 @@ export class InactivityCountdownTimer {
         if(this.timeoutCallback){
             this.timeoutCallback();
         }
-        if(this.signOutHREF){
-            this.redirect(this.signOutHREF);
+        if(this.redirectHREF){
+            this.redirect(this.redirectHREF);
         }
     }
 

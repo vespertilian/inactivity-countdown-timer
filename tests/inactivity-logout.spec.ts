@@ -74,7 +74,7 @@ describe('Inactivity logout -', () => {
 
         describe('redirection - ', () => {
             it('should redirect when the timeout expires if a url was passed in', () => {
-                let IL = setupWithClock({idleTimeoutTime: 2000, logoutHREF: 'logout.html'});
+                let IL = setupWithClock({idleTimeoutTime: 2000, redirectHREF: 'logout.html'});
                 let redirectFunction = spyOn(IL, 'redirect');
                 expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
                 jasmine.clock().tick(2001);

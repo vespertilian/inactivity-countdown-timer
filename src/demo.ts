@@ -6,7 +6,7 @@
 })();
 
 import {InactivityCountdownTimer} from './inactivity-countdown-timer'
-import {IInactivityConfig} from 'inactivity-countdown-timer.ts'
+import {IInactivityConfig} from './inactivity-countdown-timer'
 
 declare var ON_DEV: boolean;
 if(ON_DEV){
@@ -28,8 +28,8 @@ if(ON_DEV){
         }
 
         let settings: IInactivityConfig = {
-            idleTimeoutTime: 15000,
-            startCountDownTimerAt: 10000,
+            idleTimeoutTime: 15000, // 15 secs
+            startCountDownTimerAt: 10000, // 10 secs
             timeoutCallback: timeoutCallback,
             countDownCallback: countDownCallback,
             countDownCancelledCallback: countDownCancelledCallback
@@ -38,4 +38,3 @@ if(ON_DEV){
     });
 }
 
-export {InactivityLogout}
