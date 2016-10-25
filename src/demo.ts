@@ -8,6 +8,12 @@
 import {InactivityCountdownTimer} from './inactivity-countdown-timer'
 import {IInactivityConfig} from './inactivity-countdown-timer'
 
+// import the ie8EventListenerPolyfill for use wiht IE8
+import {ie8EventListenerPolyfill} from './ie8EventListenerPolyfill'
+ie8EventListenerPolyfill;
+
+// This demo is written in typescript
+// The module is bundled as a UMD module so you can use it in vanilla JS not just Typescript
 declare var ON_DEV: boolean;
 if(ON_DEV){
     console.log('In development mode loading demo code');

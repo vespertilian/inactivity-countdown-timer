@@ -1,6 +1,11 @@
-import {InactivityCountdownTimer, IInactivityConfig} from "../src/inactivity-countdown-timer";
+// import the ie8EventListenerPolyfill you need this if you want to use IE8
+import {ie8EventListenerPolyfill} from '../src/ie8EventListenerPolyfill'
+ie8EventListenerPolyfill;
+
+// this is just for the tests you do not need this to use the InactivityCountdownTimer
 require('./ie8forEachPolyfill'); // because we use forEach in this test
-// need to install jasmine clock and mock the date for testing
+
+import {InactivityCountdownTimer, IInactivityConfig} from "../src/inactivity-countdown-timer";
 describe('Inactivity logout -', () => {
 
     describe('construction', () => {

@@ -37,11 +37,11 @@ IL.cleanup()
 ##Features 
 
  - A count down callback - **alert users you are going to transition them**. 
- - Activity is **synced across tabs using local storage** (users won't be transitioned if they are active in any other tab)
+ - Activity is **synced across tabs using local storage** (users won't be transitioned if they are active in any other tab).
  - **Dynamically adjusting timer**. Which will set itself to initially timeout when the count down starts, then change to timeout every second for the countdown. 
- - Configure what 'Activity' is by passing in you're own reset event list
+ - Configure what events reset your timer and count as an 'Activity' by passing in you're own reset event list.
  - Written in typescript and bundled as a UMD module.
- - Tests with a saucelabs setup for cross browser testing
+ - Tests with a saucelabs setup for cross browser testing.
 
 By default the inactivity timeout is reset by these events: 
 
