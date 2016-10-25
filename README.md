@@ -72,8 +72,21 @@ The project is setup with both main.ts used for exporting the library and a demo
 - `npm test-via-saucelabs` runs the tests via karma against Saucelabs config(from the main ts file) 
 - `npm build` builds a version for distribution via npm
 - `npm prepublish` used when publishing to npm
+  
+[Semantic Versioning]: http://semver.org/
+[EventTarget.addEventListener()]: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
 
-### Publishing workflow
+## Benefex
+
+This module was published with support from Benefex.
+
+Benefex is the business behind RewardHub, the award-winning global employee benefits platform. RewardHub enables over 200 of the world’s largest employers to run, manage and engage their employees in reward and benefit programmes.
+[Benefex](http://www.benefex.co.uk/) 
+
+Are you a smart cookie? We’re always looking for bright, enthusiastic people to join our team in Southampton. [Benefex Careers](http://www.benefex.co.uk/careers)
+
+## Publishing workflow
+
 1. Run tests `npm test`
 2. Run build and check that your module was built (needs to be exported via main.ts)
 3. Install it into your project to test before publishing by running `npm install '/path-to-this/'`
@@ -81,12 +94,6 @@ The project is setup with both main.ts used for exporting the library and a demo
 5. Tag the release commit in git: `git tag -a v0.1.5 -m "Published v0.1.5"`
 6. Push the tags up to github: `git push origin --tags`
 7. Publish `npm publish`
-  
-[Semantic Versioning]: http://semver.org/
-[EventTarget.addEventListener()]: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-
-
-
 ## IE8 Notes
 
 Make sure you are importing the **included ie8EventListenerPolyfill** when supporting ie8.

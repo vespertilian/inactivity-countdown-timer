@@ -107,7 +107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.countDownCancelledCallback = params.countDownCancelledCallback;
 	        this.localStorageKey = params.localStorageKey || defaultInactivityConfig.localStorageKey;
 	        this.resetEvents = params.resetEvents || defaultInactivityConfig.resetEvents;
-	        this.signOutHREF = params.redirectHREF;
+	        this.redirectHREF = params.redirectHREF;
 	        // setup local storage
 	        this.localStorage = this.detectAndAssignLocalStorage();
 	        // attach events that will rest the timers
@@ -171,8 +171,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.timeoutCallback) {
 	            this.timeoutCallback();
 	        }
-	        if (this.signOutHREF) {
-	            this.redirect(this.signOutHREF);
+	        if (this.redirectHREF) {
+	            this.redirect(this.redirectHREF);
 	        }
 	    };
 	    InactivityCountdownTimer.prototype.checkIdleTime = function () {

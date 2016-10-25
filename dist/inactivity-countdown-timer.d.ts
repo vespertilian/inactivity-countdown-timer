@@ -6,7 +6,7 @@ export interface IInactivityConfig {
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
     localStorageKey?: string;
-    logoutHREF?: string;
+    redirectHREF?: string;
 }
 export declare class InactivityCountdownTimer {
     private params;
@@ -14,7 +14,7 @@ export declare class InactivityCountdownTimer {
     private localStorageKey;
     private lastResetTimeStamp;
     private localStorage;
-    private signOutHREF;
+    private redirectHREF;
     private countingDown;
     private idleTimeoutTime;
     private startCountDownTimerAt;
