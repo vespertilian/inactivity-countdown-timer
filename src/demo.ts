@@ -8,7 +8,7 @@
 import {InactivityCountdownTimer} from './inactivity-countdown-timer'
 import {IInactivityConfig} from './inactivity-countdown-timer'
 
-// import the ie8EventListenerPolyfill for use wiht IE8
+// import the ie8EventListenerPolyfill for use with IE8
 import {ie8EventListenerPolyfill} from './ie8EventListenerPolyfill'
 ie8EventListenerPolyfill;
 
