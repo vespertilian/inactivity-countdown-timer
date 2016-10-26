@@ -7,7 +7,7 @@ Useful when a user forgets to close their browser or tab before walking away fro
 
 ## Install 
 
-`npm install inactivity-countdown-timer --save`
+`npm install @benefex/inactivity-countdown-timer --save`
 
 ## Usage
 

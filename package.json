@@ -1,6 +1,6 @@
 {
   "name": "@benefex/inactivity-countdown-timer",
-  "version": "1.0.0-beta-0",
+  "version": "1.0.0-beta-1",
   "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. ",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
