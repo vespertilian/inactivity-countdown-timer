@@ -1,6 +1,6 @@
 {
   "name": "@benefex/inactivity-countdown-timer",
-  "version": "1.0.0-beta-1",
+  "version": "1.0.0-beta-2",
   "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. ",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
@@ -12,7 +12,6 @@
     "build": "cross-env NODE_ENV=distribution webpack",
     "document": "cross-env npm run typedoc -- --out ./docs src/inactivity-countdown-timer.ts --theme minimal --mode file --excludeNotExported",
     "prepublish": "cross-env npm run build",
-    "postinstall": "cross-env npm run typings install",
     "commit": "git-cz",
     "typings": "typings",
     "typedoc": "typedoc"
