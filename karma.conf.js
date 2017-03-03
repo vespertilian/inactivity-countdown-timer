@@ -102,6 +102,9 @@ module.exports = function(config) {
             suppressPassed: false, // do not print information about passed tests
             suppressSkipped: true, // do not print information about skipped tests
             showSpecTiming: false // print the time elapsed for each spec
+        },
+        mime: {
+            'text/x-typescript': ['ts','tsx']
         }
     };
 
