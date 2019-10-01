@@ -1,6 +1,6 @@
 # inactivity-countdown-timer
 
-###A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. 
+### A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle.
 
 Can be used to transition away from sensitive on screen information and redirect to another page. 
 Useful when a user forgets to close their browser or tab before walking away from their computer.

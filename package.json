@@ -1,10 +1,16 @@
 {
-  "name": "@benefex/inactivity-countdown-timer",
+  "name": "inactivity-countdown-timer",
   "version": "1.0.0-beta-2",
   "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. ",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
-  "keywords": ["inactivity", "inactive", "countdown", "timer", "idle"],
+  "keywords": [
+    "inactivity",
+    "inactive",
+    "countdown",
+    "timer",
+    "idle"
+  ],
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
     "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
@@ -46,7 +52,9 @@
     "webpack": "1.13.1",
     "webpack-dev-server": "1.14.1"
   },
-  "czConfig": {
-    "path": "node_modules/cz-conventional-changelog"
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
   }
 }
