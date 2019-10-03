@@ -14,12 +14,10 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
     "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
-    "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base src/ --host 0.0.0.0",
+    "start": "cross-env NODE_ENV=dev webpack-dev-server --host 0.0.0.0",
     "build": "cross-env NODE_ENV=distribution webpack",
     "document": "cross-env npm run typedoc -- --out ./docs src/inactivity-countdown-timer.ts --theme minimal --mode file --excludeNotExported",
-    "prepublish": "cross-env npm run build",
     "commit": "git-cz",
-    "typings": "typings",
     "typedoc": "typedoc"
   },
   "repository": {
@@ -34,22 +32,24 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jasmine": "^3.4.1",
+    "@types/node": "^12.7.9",
     "commitizen": "^2.10.1",
     "cross-env": "^1.0.8",
     "cz-conventional-changelog": "^1.2.0",
     "jasmine": "^3.5.0",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "^1.0.1",
+    "karma": "^4.3.0",
+    "karma-chrome-launcher": "^3.1.0",
     "karma-jasmine": "^2.0.1",
     "karma-sauce-launcher": "^2.0.2",
     "karma-spec-reporter": "^0.0.32",
-    "karma-webpack": "^1.8.1",
-    "ts-loader": "^0.8.2",
+    "karma-webpack": "^4.0.2",
+    "ts-loader": "^6.2.0",
     "tslint": "^5.2.0",
     "typedoc": "^0.4.5",
     "typescript": "^3.6.3",
-    "webpack": "^1.15.0",
-    "webpack-dev-server": "^1.16.5"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.2"
   },
   "config": {
     "commitizen": {

@@ -1,29 +1,29 @@
 var path = require('path');
-var webpack = require('webpack');
 
 var config = {
+  mode: 'development',
   context: path.resolve(__dirname, 'src'),
   entry: {demo: './demo.ts'},
   output: {
     path: path.resolve(__dirname, 'dev'),
     filename: '[name].js'
   },
-  plugins: [
-      new webpack.DefinePlugin({ON_DEV: process.env.NODE_ENV === 'dev'}),
-      new webpack.DefinePlugin({ON_TEST: process.env.NODE_ENV === 'test'})
-  ],
   resolve: {
-    extensions: ['', '.webpack.js', '.ts', '.js']
+    extensions: ['.ts', '.js']
   },
   module: {
-    loaders: [
+    rules: [
       { test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/}
     ]
+  },
+  devServer: {
+    contentBase: "./src"
   }
 };
 
 if(process.env.NODE_ENV === 'distribution'){
   console.log('building dist');
+  config.mode = 'production';
   config.entry = { app:'./main.ts' };
   config.output = {
     path: path.resolve(__dirname, 'dist'),
