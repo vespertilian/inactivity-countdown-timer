@@ -16,6 +16,7 @@ var config = {
       { test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/}
     ]
   },
+  devtool: 'source-map',
   devServer: {
     contentBase: "./src"
   }
