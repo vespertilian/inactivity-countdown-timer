@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig",
+  "rootDir": "src/",
+  "declaration": true,
+  "exclude": [
+    "node_modules",
+    "tests"
+  ]
+}

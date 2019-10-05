@@ -26,12 +26,24 @@ if(process.env.NODE_ENV === 'distribution'){
   console.log('building dist');
   config.mode = 'production';
   config.entry = { app:'./main.ts' };
+  config.devtool = 'source-map';
   config.output = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
     // export itself to a global umd
     library: ['InactivityLogout'],
     libraryTarget: 'umd'
+  };
+  config.module = {
+    rules: [
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          configFile: 'tsconfig.prod.json'
+        }
+      }
+    ]
   };
 }
 
