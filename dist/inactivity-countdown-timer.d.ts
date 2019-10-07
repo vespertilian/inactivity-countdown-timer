@@ -44,15 +44,15 @@ export declare class InactivityCountdownTimer {
      * it will not be garbage collected if you just delete it.
      */
     cleanup(): void;
-    private handleEvent(eventName);
-    private startPrivate(precision);
-    private resetTimer(precision);
-    private timeout();
-    private checkIdleTime();
-    private handleCountDown(timeRemaining);
-    private checkTimerPrecision(timeRemaining);
-    private getLastResetTimeStamp();
-    private setLastResetTimeStamp(timestamp);
-    private detectAndAssignLocalStorage();
-    private redirect(url);
+    private handleEvent;
+    private startPrivate;
+    private resetTimer;
+    private timeout;
+    private checkIdleTime;
+    private handleCountDown;
+    private checkTimerPrecision;
+    private getLastResetTimeStamp;
+    private setLastResetTimeStamp;
+    private detectAndAssignLocalStorage;
+    private redirect;
 }
