@@ -1,7 +1,7 @@
 {
   "name": "inactivity-countdown-timer",
-  "version": "1.0.0-beta-2",
-  "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. ",
+  "version": "1.0.0-beta-3",
+  "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle.",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
   "keywords": [
@@ -22,13 +22,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Benefex/inactivity-countdown-timer.git"
+    "url": "https://github.com/vespertilian/inactivity-countdown-timer"
   },
   "bugs": {
-    "url": "https://github.com/Benefex/inactivity-countdown-timer/issues"
+    "url": "https://github.com/vespertilian/inactivity-countdown-timer/issues"
   },
-  "homepage": "https://github.com/Benefex/inactivity-countdown-timer",
-  "author": "Benefex",
+  "homepage": "https://github.com/vespertilian/inactivity-countdown-timer",
+  "author": "Cameron Batt",
   "license": "MIT",
   "devDependencies": {
     "@types/jasmine": "^3.4.1",
