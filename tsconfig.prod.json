@@ -1,9 +1,13 @@
 {
   "extends": "./tsconfig",
-  "rootDir": "src/",
-  "declaration": true,
+  "compilerOptions": {
+    "declaration": true,
+    "rootDir": "src/",
+    "outDir": "dist/"
+  },
   "exclude": [
     "node_modules",
-    "tests"
+    "tests",
+    "src/demo.ts"
   ]
 }
