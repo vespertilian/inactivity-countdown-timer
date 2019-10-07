@@ -22,9 +22,9 @@ describe('Inactivity logout -', () => {
             let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
             let IL = new InactivityCountdownTimer();
             ['click', 'mousemove', 'keypress'].forEach((event) => {
-                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL, false);
+                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL as any, false);
             });
-            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL, false);
+            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL as any, false);
             IL.cleanup();
             IL = null;
         });
@@ -34,9 +34,9 @@ describe('Inactivity logout -', () => {
             let windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
             let IL = new InactivityCountdownTimer({resetEvents: ['scroll','dblclick']});
             ['scroll', 'dblclick'].forEach((event) => {
-                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL, false);
+                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL as any, false);
             });
-            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL, false);
+            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL as any, false);
             IL.cleanup();
             IL = null;
         });
@@ -50,9 +50,9 @@ describe('Inactivity logout -', () => {
             let IL = new InactivityCountdownTimer({resetEvents: ['click', 'mousemove']});
             IL.cleanup();
             ['click', 'mousemove'].forEach((event) => {
-                expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, IL, false);
+                expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, IL as any, false);
             });
-            expect(windowRemoveEventSpy).toHaveBeenCalledWith('load', IL, false);
+            expect(windowRemoveEventSpy).toHaveBeenCalledWith('load', IL as any, false);
             IL = null;
         })
     });
@@ -80,7 +80,7 @@ describe('Inactivity logout -', () => {
         describe('redirection - ', () => {
             it('should redirect when the timeout expires if a url was passed in', () => {
                 let IL = setupWithClock({idleTimeoutTime: 2000, redirectHREF: 'logout.html'});
-                let redirectFunction = spyOn(IL, 'redirect');
+                let redirectFunction = spyOn(IL, 'redirect' as any);
                 expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
                 jasmine.clock().tick(2001);
                 expect(redirectFunction).toHaveBeenCalledWith('logout.html');
@@ -89,7 +89,7 @@ describe('Inactivity logout -', () => {
 
             it('should not redirect when the timeout expires if a url was not passed in', () => {
                 let IL = setupWithClock({idleTimeoutTime: 2000});
-                let redirectFunction = spyOn(IL, 'redirect');
+                let redirectFunction = spyOn(IL, 'redirect' as any);
                 jasmine.clock().tick(2001);
                 expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
                 cleanupWithClock(IL)
@@ -100,7 +100,7 @@ describe('Inactivity logout -', () => {
             ['click', 'mousemove', 'keypress'].forEach(() => {
                 let IL = setupWithClock({idleTimeoutTime: 2000});
                 // we need to call through so the interval timer stops watching
-                let timeout = spyOn(IL, 'timeout').and.callThrough();
+                let timeout = spyOn(IL, 'timeout' as any).and.callThrough();
                 jasmine.clock().tick(1001); // 1001 total time
                 expect(timeout).not.toHaveBeenCalled();
                 dispatchMouseEvent('click'); // timer will reset and initialise at 2000

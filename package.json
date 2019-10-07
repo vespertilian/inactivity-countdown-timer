@@ -1,52 +1,59 @@
 {
-  "name": "@benefex/inactivity-countdown-timer",
-  "version": "1.0.0-beta-2",
-  "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle. ",
+  "name": "inactivity-countdown-timer",
+  "version": "1.0.0-beta-3",
+  "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle.",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
-  "keywords": ["inactivity", "inactive", "countdown", "timer", "idle"],
+  "keywords": [
+    "inactivity",
+    "inactive",
+    "countdown",
+    "timer",
+    "idle"
+  ],
   "scripts": {
     "test": "cross-env NODE_ENV=test karma start",
     "test-via-saucelabs": "cross-env NODE_ENV=test SAUCELABS=true karma start",
-    "start": "cross-env NODE_ENV=dev webpack-dev-server --content-base src/ --host 0.0.0.0",
+    "start": "cross-env NODE_ENV=dev webpack-dev-server --host 0.0.0.0",
     "build": "cross-env NODE_ENV=distribution webpack",
     "document": "cross-env npm run typedoc -- --out ./docs src/inactivity-countdown-timer.ts --theme minimal --mode file --excludeNotExported",
-    "prepublish": "cross-env npm run build",
     "commit": "git-cz",
-    "typings": "typings",
     "typedoc": "typedoc"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Benefex/inactivity-countdown-timer.git"
+    "url": "https://github.com/vespertilian/inactivity-countdown-timer"
   },
   "bugs": {
-    "url": "https://github.com/Benefex/inactivity-countdown-timer/issues"
+    "url": "https://github.com/vespertilian/inactivity-countdown-timer/issues"
   },
-  "homepage": "https://github.com/Benefex/inactivity-countdown-timer",
-  "author": "Benefex",
+  "homepage": "https://github.com/vespertilian/inactivity-countdown-timer",
+  "author": "Cameron Batt",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
-    "commitizen": "2.8.6",
-    "cross-env": "1.0.8",
-    "cz-conventional-changelog": "1.2.0",
-    "jasmine": "2.4.1",
-    "karma": "0.13.22",
-    "karma-chrome-launcher": "1.0.1",
-    "karma-jasmine": "1.0.2",
-    "karma-sauce-launcher": "0.3.1",
-    "karma-spec-reporter": "0.0.26",
-    "karma-webpack": "1.7.0",
-    "ts-loader": "0.8.1",
-    "tslint": "3.11.0",
-    "typedoc": "0.4.5",
-    "typescript": "1.8.10",
-    "typings": "1.3.3",
-    "webpack": "1.13.1",
-    "webpack-dev-server": "1.14.1"
+    "@types/jasmine": "^3.4.1",
+    "@types/node": "^12.7.9",
+    "commitizen": "^4.0.3",
+    "cross-env": "^1.0.8",
+    "cz-conventional-changelog": "^3.0.2",
+    "jasmine": "^3.5.0",
+    "karma": "^4.3.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-sauce-launcher": "^2.0.2",
+    "karma-spec-reporter": "^0.0.32",
+    "karma-webpack": "^4.0.2",
+    "ts-loader": "^6.2.0",
+    "tslint": "^5.2.0",
+    "typedoc": "^0.15.0",
+    "typescript": "^3.6.3",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.2"
   },
-  "czConfig": {
-    "path": "node_modules/cz-conventional-changelog"
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
   }
 }

@@ -2,13 +2,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
-    "declaration": true
+    "sourceMap": true
   },
   "exclude": [
     "node_modules"
   ],
-  "include": [
-    "typings/globals",
-    "typings/index.d.ts"
-  ]
+  "typeRoots": ["node_modules/@types"]
 }
