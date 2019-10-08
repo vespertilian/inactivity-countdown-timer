@@ -52,7 +52,8 @@ By default the inactivity timeout is reset by these events:
 
 ## Supports
 
- - IE9+
+ - IE9 with core-js (import 'core-js/features/object/assign';)
+ - IE10+
  - Chrome
  - Firefox
  - Safari

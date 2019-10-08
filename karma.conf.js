@@ -83,7 +83,8 @@ module.exports = function(config) {
         webpack: {
             mode: 'development',
             module: webpackConfig.module,
-            resolve: webpackConfig.resolve
+            resolve: webpackConfig.resolve,
+            devtool: 'inline-source-map'
         },
 
         webpackMiddleware: {

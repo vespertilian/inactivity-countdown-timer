@@ -1,4 +1,6 @@
 import {InactivityCountdownTimer, IInactivityConfig} from "../src/inactivity-countdown-timer";
+import 'core-js/features/object/assign';
+
 describe('Inactivity logout -', () => {
     function setup(params?: IInactivityConfig): {IL: InactivityCountdownTimer} {
         const IL = new InactivityCountdownTimer();
