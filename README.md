@@ -11,9 +11,9 @@ Useful when a user forgets to close their browser or tab before walking away fro
 
 ## Usage
 
-```js
+```ts
 // Optional config vars
-let settings = {
+const settings = {
     idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
     resetEvents?: string[];
@@ -21,11 +21,10 @@ let settings = {
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
     localStorageKey?: string;
-    redirectHREF?: string;
 }
 
 // Instantiate new logout object
-let IL = new InactivityLogout(settings);
+const IL = new InactivityLogout(settings);
 
 // make sure you cleanup the object when you are finished using it.
 // will not be garbage collected unless you clean it up because of the timers
@@ -53,7 +52,7 @@ By default the inactivity timeout is reset by these events:
 
 ## Supports
 
- - IE8+ (you need to include the ie8EventListenerPolyfill)
+ - IE9+
  - Chrome
  - Firefox
  - Safari
@@ -84,10 +83,6 @@ The project is setup with both main.ts used for exporting the library and a demo
 5. Tag the release commit in git: `git tag -a v0.1.5 -m "Published v0.1.5"`
 6. Push the tags up to github: `git push origin --tags`
 7. Publish `npm publish`
-
-## IE8 Notes
-
-Make sure you are importing the **included ie8EventListenerPolyfill** when supporting ie8.
 
 ## Benefex
 
