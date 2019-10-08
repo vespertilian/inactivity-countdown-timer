@@ -1,16 +1,5 @@
-// Fix logging for ie8 when dev tools are not open
-(function(){
-    if (typeof console == "undefined") {
-        this.console = { log: function () { } };
-    }
-})();
-
 import {InactivityCountdownTimer} from './inactivity-countdown-timer'
 import {IInactivityConfig} from './inactivity-countdown-timer'
-
-// import the ie8EventListenerPolyfill for use with IE8
-import {ie8EventListenerPolyfill} from './ie8EventListenerPolyfill'
-ie8EventListenerPolyfill;
 
 // This demo is written in typescript
 // The module is bundled as a UMD module so you can use it in vanilla JS not just Typescript

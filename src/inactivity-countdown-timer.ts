@@ -29,7 +29,6 @@ const defaultInactivityConfig: IInactivityConfig = {
     resetEvents: ['click','mousemove','keypress']
 };
 
-// require('./ie8addEventListener');
 export class InactivityCountdownTimer {
     private timeoutTime: number;
     private localStorageKey: string;
