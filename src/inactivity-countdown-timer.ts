@@ -9,28 +9,13 @@ export interface IInactivityConfig {
     redirectHREF?: string;
 }
 
-interface IWindow extends Window {
-    addEventListener(type: string, listener: any, useCapture?: boolean): void;
-    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
-}
-
-declare var window: IWindow;
-
-interface IDocument extends Document {
-    addEventListener(type: string, listener: any, useCapture?: boolean): void;
-    removeEventListener(type: string, listener?: any, useCapture?: boolean): void;
-}
-
-declare var document: IDocument;
-
 const defaultInactivityConfig: IInactivityConfig = {
     idleTimeoutTime: 10000,
     localStorageKey: 'inactivity_logout_local_storage',
     resetEvents: ['click','mousemove','keypress']
 };
 
-// require('./ie8addEventListener');
-export class InactivityCountdownTimer {
+export class InactivityCountdownTimer implements EventListenerObject {
     private timeoutTime: number;
     private localStorageKey: string;
     private lastResetTimeStamp: number;
@@ -110,6 +95,14 @@ export class InactivityCountdownTimer {
         window.clearInterval(this.idleTimeoutID);
     }
 
+    // see EVENT_LISTENERS_THIS_IE8 about why we use handleEvent
+    handleEvent(eventName: Event): void {
+        // we don't need to do anything with the eventName
+        // as we want all events to fire the same actions
+        let currentTime = (new Date).getTime();
+        this.setLastResetTimeStamp(currentTime);
+    }
+
     /**
      * **You must call cleanup** before you delete the object.
      * As the timer in the class is calling a method on itself
@@ -122,14 +115,6 @@ export class InactivityCountdownTimer {
         window.removeEventListener('load', this, false);
         window.removeEventListener('storage', function() {});
         this.stop();
-    }
-
-    // see readme about why we use handleEvent
-    private handleEvent(eventName: string): void {
-        // we don't need to do anything with the eventName
-        // as we want all events to fire the same actions
-        let currentTime = (new Date).getTime();
-        this.setLastResetTimeStamp(currentTime);
     }
 
     private startPrivate(precision: number) {
