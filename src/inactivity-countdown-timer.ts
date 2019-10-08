@@ -6,7 +6,6 @@ export interface IInactivityConfig {
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
     localStorageKey?: string;
-    redirectHREF?: string;
 }
 
 const defaultInactivityConfig: IInactivityConfig = {
@@ -20,7 +19,6 @@ export class InactivityCountdownTimer implements EventListenerObject {
     private localStorageKey: string;
     private lastResetTimeStamp: number;
     private localStorage: Storage;
-    private redirectHREF: string;
     private countingDown: boolean = false;
 
     private idleTimeoutTime: number;
@@ -62,7 +60,6 @@ export class InactivityCountdownTimer implements EventListenerObject {
         this.countDownCancelledCallback = params.countDownCancelledCallback;
         this.localStorageKey = params.localStorageKey || defaultInactivityConfig.localStorageKey;
         this.resetEvents = params.resetEvents || defaultInactivityConfig.resetEvents;
-        this.redirectHREF = params.redirectHREF;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
@@ -80,6 +77,17 @@ export class InactivityCountdownTimer implements EventListenerObject {
         this.start();
     }
 
+    // see EVENT_LISTENERS_THIS_IE8.md about why we use handleEvent
+    /**
+     * The event listener object we implement
+     */
+    handleEvent(eventName: Event): void {
+        // we don't need to do anything with the eventName
+        // as we want all events to fire the same actions
+        let currentTime = (new Date).getTime();
+        this.setLastResetTimeStamp(currentTime);
+    }
+
     /**
      * Starts the timer
      */
@@ -93,14 +101,6 @@ export class InactivityCountdownTimer implements EventListenerObject {
      */
     public stop(): void {
         window.clearInterval(this.idleTimeoutID);
-    }
-
-    // see EVENT_LISTENERS_THIS_IE8 about why we use handleEvent
-    handleEvent(eventName: Event): void {
-        // we don't need to do anything with the eventName
-        // as we want all events to fire the same actions
-        let currentTime = (new Date).getTime();
-        this.setLastResetTimeStamp(currentTime);
     }
 
     /**
@@ -134,9 +134,6 @@ export class InactivityCountdownTimer implements EventListenerObject {
         if(this.timeoutCallback){
             this.timeoutCallback();
         }
-        if(this.redirectHREF){
-            this.redirect(this.redirectHREF);
-        }
     }
 
     private checkIdleTime(){
@@ -163,7 +160,6 @@ export class InactivityCountdownTimer implements EventListenerObject {
             this.countingDown = false;
         }
     }
-
 
     private checkTimerPrecision(timeRemaining: number) {
         // when we are counting down we want to
@@ -223,14 +219,6 @@ export class InactivityCountdownTimer implements EventListenerObject {
             return result && storage;
         } catch(exception) {
             console.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
-        }
-    }
-
-    // cannot mock location changes
-    // so little function allows us to verify redirect is called
-    private redirect (url: string): void {
-        if (url) {
-            window.location.href = url;
         }
     }
 }

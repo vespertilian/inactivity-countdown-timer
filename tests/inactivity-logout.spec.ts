@@ -77,25 +77,6 @@ describe('Inactivity logout -', () => {
             cleanupWithClock(IL);
         });
 
-        describe('redirection - ', () => {
-            it('should redirect when the timeout expires if a url was passed in', () => {
-                let IL = setupWithClock({idleTimeoutTime: 2000, redirectHREF: 'logout.html'});
-                let redirectFunction = spyOn(IL, 'redirect' as any);
-                expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
-                jasmine.clock().tick(2001);
-                expect(redirectFunction).toHaveBeenCalledWith('logout.html');
-                cleanupWithClock(IL)
-            });
-
-            it('should not redirect when the timeout expires if a url was not passed in', () => {
-                let IL = setupWithClock({idleTimeoutTime: 2000});
-                let redirectFunction = spyOn(IL, 'redirect' as any);
-                jasmine.clock().tick(2001);
-                expect(redirectFunction).not.toHaveBeenCalledWith('logout.html');
-                cleanupWithClock(IL)
-            });
-        });
-
         it('should reset the timeout time if one of the event handlers get\s called', () => {
             ['click', 'mousemove', 'keypress'].forEach(() => {
                 let IL = setupWithClock({idleTimeoutTime: 2000});
