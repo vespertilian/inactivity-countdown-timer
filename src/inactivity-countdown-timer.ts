@@ -1,10 +1,13 @@
-export interface IInactivityConfig {
-    idleTimeoutTime?: number;
-    startCountDownTimerAt?: number;
-    resetEvents?: string[];
+export interface IRegisterCallBacks {
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
+}
+
+export interface IInactivityConfig extends IRegisterCallBacks {
+    idleTimeoutTime?: number;
+    startCountDownTimerAt?: number;
+    resetEvents?: string[];
     localStorageKey?: string;
 }
 
@@ -15,29 +18,38 @@ const defaultInactivityConfig: IInactivityConfig = {
 };
 
 export class InactivityCountdownTimer implements EventListenerObject {
-    private timeoutTime: number;
-    private localStorageKey: string;
-    private lastResetTimeStamp: number;
-    private localStorage: Storage;
-    private countingDown: boolean = false;
-
+    // InactivityConfig
     private idleTimeoutTime: number;
     private startCountDownTimerAt: number;
-    private resetEvents: string[];
+    private localStorageKey: string;
+    private resetEvents: string[] = [];
+
+    // IRegisterCallbacks
     private timeoutCallback: () => void;
     private countDownCallback: (secondsLeft: number) => void;
     private countDownCancelledCallback: () => void;
+
+    // Internal vars
+    private localStorage: Storage;
+    private timeoutTime: number;
+    private lastResetTimeStamp: number;
+    private countingDown: boolean = false;
     private idleTimeoutID: number;
     private currentTimerPrecision: number;
+
+    constructor(params?: IInactivityConfig) {
+        if (params) { this.setup(params) }
+    }
     /**
      * @param params
      * - **idleTimeoutTime**: 10000 - ms / 10 seconds
      * - **localStorageKey**: 'inactivity_logout_local_storage'
      */
-    constructor(private params: IInactivityConfig = defaultInactivityConfig) {
+    setup(params?: IInactivityConfig): {start: () => void} {
+        this.cleanup();
         Object.assign(this, defaultInactivityConfig, params);
 
-        if((typeof(params.startCountDownTimerAt)) === 'number'){
+        if((params && typeof(params.startCountDownTimerAt)) === 'number'){
             // if start count down timer is present make sure its a number and less than idleTimeoutTime
             if(params.startCountDownTimerAt > this.idleTimeoutTime) {
                 console.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
@@ -66,7 +78,9 @@ export class InactivityCountdownTimer implements EventListenerObject {
         // this fixes a bug in ie11 where the local storage does not sync
         // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
         window.addEventListener('storage', function() {}); // effectively a no-op
-        this.start();
+
+        const start = () => this.start();
+        return {start};
     }
 
     // see EVENT_LISTENERS_THIS_IE8.md about why we use handleEvent
@@ -83,7 +97,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
     /**
      * Starts the timer
      */
-    public start(): void {
+    start(): void {
         this.setLastResetTimeStamp((new Date()).getTime());
         this.startPrivate(this.timeoutTime)
     }
@@ -91,7 +105,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
     /**
      * Clears the timer
      */
-    public stop(): void {
+    stop(): void {
         window.clearInterval(this.idleTimeoutID);
     }
 
@@ -100,13 +114,15 @@ export class InactivityCountdownTimer implements EventListenerObject {
      * As the timer in the class is calling a method on itself
      * it will not be garbage collected if you just delete it.
      */
-    public cleanup(): void {
-        for(let i=0; i < this.resetEvents.length; i++) {
-            document.removeEventListener(this.resetEvents[i], this, false)
+    cleanup(): void {
+        if (this.resetEvents.length) {
+            for(let i=0; i < this.resetEvents.length; i++) {
+                document.removeEventListener(this.resetEvents[i], this, false)
+            }
+            window.removeEventListener('load', this, false);
+            window.removeEventListener('storage', function() {});
+            this.stop();
         }
-        window.removeEventListener('load', this, false);
-        window.removeEventListener('storage', function() {});
-        this.stop();
     }
 
     private startPrivate(precision: number) {
