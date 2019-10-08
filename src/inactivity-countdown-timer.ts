@@ -35,9 +35,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
      * - **localStorageKey**: 'inactivity_logout_local_storage'
      */
     constructor(private params: IInactivityConfig = defaultInactivityConfig) {
-        // config var defaults
-        // how long you can be idle for before we time you out
-        this.idleTimeoutTime = params.idleTimeoutTime || defaultInactivityConfig.idleTimeoutTime;
+        Object.assign(this, defaultInactivityConfig, params);
 
         if((typeof(params.startCountDownTimerAt)) === 'number'){
             // if start count down timer is present make sure its a number and less than idleTimeoutTime
@@ -54,12 +52,6 @@ export class InactivityCountdownTimer implements EventListenerObject {
             this.startCountDownTimerAt = 0;
             this.timeoutTime = this.idleTimeoutTime;
         }
-
-        this.timeoutCallback = params.timeoutCallback;
-        this.countDownCallback = params.countDownCallback;
-        this.countDownCancelledCallback = params.countDownCancelledCallback;
-        this.localStorageKey = params.localStorageKey || defaultInactivityConfig.localStorageKey;
-        this.resetEvents = params.resetEvents || defaultInactivityConfig.resetEvents;
 
         // setup local storage
         this.localStorage = this.detectAndAssignLocalStorage();
