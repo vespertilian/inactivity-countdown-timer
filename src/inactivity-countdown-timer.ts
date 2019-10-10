@@ -17,6 +17,11 @@ const defaultInactivityConfig: IInactivityConfig = {
     resetEvents: ['click','mousemove','keypress']
 };
 
+export enum InactivityCountdownTimerStatus {
+    started = 'started',
+    stopped = 'stopped'
+}
+
 export class InactivityCountdownTimer implements EventListenerObject {
     // InactivityConfig
     private idleTimeoutTime: number;
@@ -36,6 +41,9 @@ export class InactivityCountdownTimer implements EventListenerObject {
     private countingDown: boolean = false;
     private idleTimeoutID: number;
     private currentTimerPrecision: number;
+
+    // status public
+    status: InactivityCountdownTimerStatus = InactivityCountdownTimerStatus.stopped;
 
     constructor(params?: IInactivityConfig) {
         if (params) { this.setup(params) }
@@ -99,7 +107,8 @@ export class InactivityCountdownTimer implements EventListenerObject {
      */
     start(): void {
         this.setLastResetTimeStamp((new Date()).getTime());
-        this.startPrivate(this.timeoutTime)
+        this.startPrivate(this.timeoutTime);
+        this.status = InactivityCountdownTimerStatus.started;
     }
 
     /**
@@ -107,6 +116,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
      */
     stop(): void {
         window.clearInterval(this.idleTimeoutID);
+        this.status = InactivityCountdownTimerStatus.stopped;
     }
 
     /**

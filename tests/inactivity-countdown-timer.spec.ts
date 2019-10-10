@@ -2,7 +2,7 @@ import {InactivityCountdownTimer, IInactivityConfig} from "../src/inactivity-cou
 import 'core-js/features/object/assign';
 
 describe('Inactivity logout -', () => {
-    function setup(params?: IInactivityConfig): {IL: InactivityCountdownTimer} {
+    function setupAndStart(params?: IInactivityConfig): {IL: InactivityCountdownTimer} {
         const IL = new InactivityCountdownTimer();
         IL.setup(params).start();
         return {IL}
@@ -11,7 +11,7 @@ describe('Inactivity logout -', () => {
     function setupWithClock(params: IInactivityConfig): {IL: InactivityCountdownTimer} {
         jasmine.clock().install();
         jasmine.clock().mockDate();
-        return setup(params);
+        return setupAndStart(params);
     }
 
     function cleanupWithClock(IL: InactivityCountdownTimer): void {
@@ -23,7 +23,7 @@ describe('Inactivity logout -', () => {
     describe('construction', () => {
         it('should log to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
             const log = spyOn(window.console, 'log');
-            const {IL} = setup({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
+            const {IL} = setupAndStart({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
             IL.cleanup();
             expect(log).toHaveBeenCalledWith('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime')
         });
@@ -31,7 +31,7 @@ describe('Inactivity logout -', () => {
         it('should attach event handlers to document.click, document.mousemove, document.keypress, window.load when none are passed in', () => {
             const documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             const windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
-            const {IL} = setup();
+            const {IL} = setupAndStart();
             ['click', 'mousemove', 'keypress'].forEach((event) => {
                 expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL as any, false);
             });
@@ -42,7 +42,7 @@ describe('Inactivity logout -', () => {
         it('should attach custom event handlers to document and window when they are passed in', () => {
             const documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             const windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
-            const {IL} = setup({resetEvents: ['scroll','dblclick']});
+            const {IL} = setupAndStart({resetEvents: ['scroll','dblclick']});
             ['scroll', 'dblclick'].forEach((event) => {
                 expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL as any, false);
             });
@@ -51,11 +51,31 @@ describe('Inactivity logout -', () => {
         });
     });
 
+    describe('start', () => {
+        it('sets the status to started from stopped', () => {
+            const IL = new InactivityCountdownTimer();
+            expect(IL.status).toEqual('stopped');
+            IL.start();
+            expect(IL.status).toEqual('started');
+            IL.cleanup();
+        });
+    });
+
+    describe('stop', () => {
+        it('sets the status to stopped from started', () => {
+            const {IL} = setupAndStart();
+            expect(IL.status).toEqual('started');
+            IL.stop();
+            expect(IL.status).toEqual('stopped');
+            IL.cleanup();
+        });
+    });
+
     describe('cleanup removing event listeners -', () => {
         it('should remove event listeners when .cleanup is called', () => {
             const documentRemoveEventSpy = spyOn(document, 'removeEventListener').and.callThrough();
             const windowRemoveEventSpy = spyOn(window, 'removeEventListener').and.callThrough();
-            const {IL} = setup({resetEvents: ['click', 'mousemove']});
+            const {IL} = setupAndStart({resetEvents: ['click', 'mousemove']});
             IL.cleanup();
             ['click', 'mousemove'].forEach((event) => {
                 expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, IL as any, false);
