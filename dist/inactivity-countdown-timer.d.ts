@@ -1,35 +1,48 @@
-export interface IInactivityConfig {
-    idleTimeoutTime?: number;
-    startCountDownTimerAt?: number;
-    resetEvents?: string[];
+export interface IRegisterCallBacks {
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
-    localStorageKey?: string;
-    redirectHREF?: string;
 }
-export declare class InactivityCountdownTimer {
-    private params;
-    private timeoutTime;
-    private localStorageKey;
-    private lastResetTimeStamp;
-    private localStorage;
-    private redirectHREF;
-    private countingDown;
+export interface IInactivityConfig extends IRegisterCallBacks {
+    idleTimeoutTime?: number;
+    startCountDownTimerAt?: number;
+    resetEvents?: string[];
+    localStorageKey?: string;
+}
+export declare enum InactivityCountdownTimerStatus {
+    started = "started",
+    stopped = "stopped"
+}
+export declare class InactivityCountdownTimer implements EventListenerObject {
     private idleTimeoutTime;
     private startCountDownTimerAt;
+    private localStorageKey;
     private resetEvents;
     private timeoutCallback;
     private countDownCallback;
     private countDownCancelledCallback;
+    private localStorage;
+    private timeoutTime;
+    private lastResetTimeStamp;
+    private countingDown;
     private idleTimeoutID;
     private currentTimerPrecision;
+    status: InactivityCountdownTimerStatus;
+    readonly started: boolean;
+    readonly stopped: boolean;
+    constructor(params?: IInactivityConfig);
     /**
      * @param params
      * - **idleTimeoutTime**: 10000 - ms / 10 seconds
      * - **localStorageKey**: 'inactivity_logout_local_storage'
      */
-    constructor(params?: IInactivityConfig);
+    setup(params?: IInactivityConfig): {
+        start: () => void;
+    };
+    /**
+     * The event listener object we implement
+     */
+    handleEvent(eventName: Event): void;
     /**
      * Starts the timer
      */
@@ -44,7 +57,6 @@ export declare class InactivityCountdownTimer {
      * it will not be garbage collected if you just delete it.
      */
     cleanup(): void;
-    private handleEvent;
     private startPrivate;
     private resetTimer;
     private timeout;
@@ -54,5 +66,4 @@ export declare class InactivityCountdownTimer {
     private getLastResetTimeStamp;
     private setLastResetTimeStamp;
     private detectAndAssignLocalStorage;
-    private redirect;
 }

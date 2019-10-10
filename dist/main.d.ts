@@ -1,3 +1,4 @@
 export { InactivityCountdownTimer } from './inactivity-countdown-timer';
 export { IInactivityConfig } from './inactivity-countdown-timer';
-export { ie8EventListenerPolyfill } from './ie8EventListenerPolyfill';
+export { IRegisterCallBacks } from './inactivity-countdown-timer';
+export { InactivityCountdownTimerStatus } from './inactivity-countdown-timer';
