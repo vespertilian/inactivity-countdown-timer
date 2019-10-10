@@ -44,6 +44,12 @@ export class InactivityCountdownTimer implements EventListenerObject {
 
     // status public
     status: InactivityCountdownTimerStatus = InactivityCountdownTimerStatus.stopped;
+    get started(): boolean {
+        return this.status === InactivityCountdownTimerStatus.started
+    }
+    get stopped(): boolean {
+        return this.status === InactivityCountdownTimerStatus.stopped
+    }
 
     constructor(params?: IInactivityConfig) {
         if (params) { this.setup(params) }

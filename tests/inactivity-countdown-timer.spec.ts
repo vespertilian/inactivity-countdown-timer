@@ -57,6 +57,8 @@ describe('Inactivity logout -', () => {
             expect(IL.status).toEqual('stopped');
             IL.start();
             expect(IL.status).toEqual('started');
+            expect(IL.started).toBe(true);
+            expect(IL.stopped).toBe(false);
             IL.cleanup();
         });
     });
@@ -67,6 +69,8 @@ describe('Inactivity logout -', () => {
             expect(IL.status).toEqual('started');
             IL.stop();
             expect(IL.status).toEqual('stopped');
+            expect(IL.stopped).toBe(true);
+            expect(IL.started).toBe(false);
             IL.cleanup();
         });
     });
