@@ -1,118 +1,118 @@
 import {InactivityCountdownTimer, IInactivityConfig} from "../src/inactivity-countdown-timer";
 import 'core-js/features/object/assign';
 
-describe('Inactivity logout -', () => {
-    function setupAndStart(params?: IInactivityConfig): {IL: InactivityCountdownTimer} {
-        const IL = new InactivityCountdownTimer();
-        IL.setup(params).start();
-        return {IL}
+describe('Inactivity countdown timer', () => {
+    function setupAndStart(params?: IInactivityConfig): {ict: InactivityCountdownTimer} {
+        const ict = new InactivityCountdownTimer();
+        ict.setup(params).start();
+        return {ict}
     }
 
-    function setupWithClock(params: IInactivityConfig): {IL: InactivityCountdownTimer} {
+    function setupWithClock(params: IInactivityConfig): {ict: InactivityCountdownTimer} {
         jasmine.clock().install();
         jasmine.clock().mockDate();
         return setupAndStart(params);
     }
 
-    function cleanupWithClock(IL: InactivityCountdownTimer): void {
-        IL.cleanup();
-        IL = null;
+    function cleanupWithClock(ict: InactivityCountdownTimer): void {
+        ict.cleanup();
+        ict = null;
         jasmine.clock().uninstall();
     }
 
     describe('construction', () => {
-        it('should log to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
+        it('Logs to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
             const log = spyOn(window.console, 'log');
-            const {IL} = setupAndStart({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
-            IL.cleanup();
+            const {ict} = setupAndStart({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
+            ict.cleanup();
             expect(log).toHaveBeenCalledWith('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime')
         });
 
-        it('should attach event handlers to document.click, document.mousemove, document.keypress, window.load when none are passed in', () => {
+        it('Attaches event handlers to document.click, document.mousemove, document.keypress, window.load when none are passed in', () => {
             const documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             const windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
-            const {IL} = setupAndStart();
+            const {ict} = setupAndStart();
             ['click', 'mousemove', 'keypress'].forEach((event) => {
-                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL as any, false);
+                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, ict as any, false);
             });
-            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL as any, false);
-            IL.cleanup();
+            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', ict as any, false);
+            ict.cleanup();
         });
 
-        it('should attach custom event handlers to document and window when they are passed in', () => {
+        it('Attaches custom event handlers to document and window when they are passed in', () => {
             const documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             const windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
-            const {IL} = setupAndStart({resetEvents: ['scroll','dblclick']});
+            const {ict} = setupAndStart({resetEvents: ['scroll','dblclick']});
             ['scroll', 'dblclick'].forEach((event) => {
-                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, IL as any, false);
+                expect(documentAttachEventSpy).toHaveBeenCalledWith(event, ict as any, false);
             });
-            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', IL as any, false);
-            IL.cleanup();
+            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', ict as any, false);
+            ict.cleanup();
         });
     });
 
     describe('start', () => {
         it('sets the status to started from stopped', () => {
-            const IL = new InactivityCountdownTimer();
-            expect(IL.status).toEqual('stopped');
-            IL.start();
-            expect(IL.status).toEqual('started');
-            expect(IL.started).toBe(true);
-            expect(IL.stopped).toBe(false);
-            IL.cleanup();
+            const ict = new InactivityCountdownTimer();
+            expect(ict.status).toEqual('stopped');
+            ict.start();
+            expect(ict.status).toEqual('started');
+            expect(ict.started).toBe(true);
+            expect(ict.stopped).toBe(false);
+            ict.cleanup();
         });
     });
 
     describe('stop', () => {
         it('sets the status to stopped from started', () => {
-            const {IL} = setupAndStart();
-            expect(IL.status).toEqual('started');
-            IL.stop();
-            expect(IL.status).toEqual('stopped');
-            expect(IL.stopped).toBe(true);
-            expect(IL.started).toBe(false);
-            IL.cleanup();
+            const {ict} = setupAndStart();
+            expect(ict.status).toEqual('started');
+            ict.stop();
+            expect(ict.status).toEqual('stopped');
+            expect(ict.stopped).toBe(true);
+            expect(ict.started).toBe(false);
+            ict.cleanup();
         });
     });
 
     describe('cleanup removing event listeners -', () => {
-        it('should remove event listeners when .cleanup is called', () => {
+        it('removes event listeners when .cleanup is called', () => {
             const documentRemoveEventSpy = spyOn(document, 'removeEventListener').and.callThrough();
             const windowRemoveEventSpy = spyOn(window, 'removeEventListener').and.callThrough();
-            const {IL} = setupAndStart({resetEvents: ['click', 'mousemove']});
-            IL.cleanup();
+            const {ict} = setupAndStart({resetEvents: ['click', 'mousemove']});
+            ict.cleanup();
             ['click', 'mousemove'].forEach((event) => {
-                expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, IL as any, false);
+                expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, ict as any, false);
             });
-            expect(windowRemoveEventSpy).toHaveBeenCalledWith('load', IL as any, false);
+            expect(windowRemoveEventSpy).toHaveBeenCalledWith('load', ict as any, false);
         })
     });
 
     describe('timing out -', () => {
-        it('should call the params.timeoutCallback if one was passed in', () => {
+        it('calls the params.timeoutCallback if one was passed in', () => {
             const callback = jasmine.createSpy('callback');
-            const {IL} = setupWithClock({idleTimeoutTime: 2000, timeoutCallback: callback});
+            const {ict} = setupWithClock({idleTimeoutTime: 2000, timeoutCallback: callback});
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(2001);
             expect(callback).toHaveBeenCalled();
-            cleanupWithClock(IL)
+            cleanupWithClock(ict)
         });
 
-        it('should cleanup when the idleTimeout is finished', () => {
-            const {IL} = setupWithClock({idleTimeoutTime: 2000});
+        it('cleanups event listeners the idleTimeout is finished', () => {
+            const {ict} = setupWithClock({idleTimeoutTime: 2000});
             // we need to call through so the interval timer stops watching
-            const cleanup = spyOn(IL, 'cleanup').and.callThrough();
+            const cleanup = spyOn(ict, 'cleanup').and.callThrough();
             expect(cleanup).not.toHaveBeenCalled();
             jasmine.clock().tick(2001);
             expect(cleanup).toHaveBeenCalled();
-            cleanupWithClock(IL);
+            cleanupWithClock(ict);
         });
 
-        it('should reset the timeout time if one of the event handlers get\s called', () => {
+        it(`resets the timeout time if one of the event handlers get's called`, () => {
             ['click', 'mousemove', 'keypress'].forEach(() => {
-                const {IL} = setupWithClock({idleTimeoutTime: 2000});
+                const {ict} = setupWithClock({idleTimeoutTime: 2000});
                 // we need to call through so the interval timer stops watching
-                const timeout = spyOn(IL, 'timeout' as any).and.callThrough();
+                const timeout = spyOn(ict, 'timeout' as any).and.callThrough();
                 jasmine.clock().tick(1001); // 1001 total time
                 expect(timeout).not.toHaveBeenCalled();
                 dispatchMouseEvent('click'); // timer will reset and initialise at 2000
@@ -120,20 +120,20 @@ describe('Inactivity logout -', () => {
                 expect(timeout).not.toHaveBeenCalled();
                 jasmine.clock().tick(4000); // 3001
                 expect(timeout).toHaveBeenCalledTimes(1);
-                cleanupWithClock(IL)
+                cleanupWithClock(ict)
             });
         });
     });
 
     describe('counting down - ', () => {
-        it('should call the params.countDownCallback when the time reaches the startCountdownTimerAt value', () => {
+        it('calls the params.countDownCallback when the time reaches the startCountdownTimerAt value', () => {
             const callback = jasmine.createSpy('callback');
             const settings: IInactivityConfig = {
                 idleTimeoutTime: 20000,
                 startCountDownTimerAt: 10000,
                 countDownCallback: callback
             };
-            const {IL} = setupWithClock(settings);
+            const {ict} = setupWithClock(settings);
             jasmine.clock().tick(9000);
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
@@ -145,10 +145,10 @@ describe('Inactivity logout -', () => {
             jasmine.clock().tick(1000);
             expect(callback).toHaveBeenCalledWith(8);
             expect(callback).toHaveBeenCalledTimes(3);
-            cleanupWithClock(IL)
+            cleanupWithClock(ict)
         });
 
-        it('should call the params.countDownCancelledCallback when the countdown is aborted', () => {
+        it('calls the params.countDownCancelledCallback when the countdown is aborted', () => {
             const countDownCallback = jasmine.createSpy('countDownCallback');
             const countDownCancelledCallback = jasmine.createSpy('countDownCancelledCallback');
             const settings: IInactivityConfig = {
@@ -157,7 +157,7 @@ describe('Inactivity logout -', () => {
                 countDownCallback: countDownCallback,
                 countDownCancelledCallback: countDownCancelledCallback
             };
-            const {IL} = setupWithClock(settings);
+            const {ict} = setupWithClock(settings);
             jasmine.clock().tick(9000);
             expect(countDownCallback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
@@ -167,20 +167,19 @@ describe('Inactivity logout -', () => {
             dispatchMouseEvent('click'); // timer will reset and initialise at 20000
             jasmine.clock().tick(2000);
             expect(countDownCancelledCallback).toHaveBeenCalled();
-            cleanupWithClock(IL)
+            cleanupWithClock(ict)
         });
-
     });
 
     describe('timeoutPrecision', () => {
-        it('should dynamically adjust the timeout precision', () => {
+        it('dynamically adjust the timeout precision', () => {
             const countDownCallback = jasmine.createSpy('countDownCallback');
             const settings: IInactivityConfig = {
                 idleTimeoutTime: 1000 * 60 * 5, // 5 minutes
                 startCountDownTimerAt: 1000 * 30, // 30 seconds
                 countDownCallback: countDownCallback
             };
-            const {IL} = setupWithClock(settings);
+            const {ict} = setupWithClock(settings);
             const fourMins = 1000 * 60 * 4;
             const twentyNineSeconds = 1000 * 29;
             // should call countdown callback only once at 4:30
@@ -199,12 +198,12 @@ describe('Inactivity logout -', () => {
             expect(countDownCallback).toHaveBeenCalledTimes(3);
             jasmine.clock().tick(1000); // 4:30
             expect(countDownCallback).toHaveBeenCalledTimes(4);
-            cleanupWithClock(IL);
+            cleanupWithClock(ict);
         });
     });
 
     describe('localstorage - ', () => {
-        it('should react to updates by other windows through local storage', () => {
+        it('reacts to updates by other windows through local storage', () => {
             const callback = jasmine.createSpy('callback');
             const localStorageKey = 'idleTimeoutTimeKey';
             const settings = {
@@ -212,7 +211,7 @@ describe('Inactivity logout -', () => {
                 timeoutCallback: callback,
                 localStorageKey: localStorageKey
             };
-            const {IL} = setupWithClock(settings);
+            const {ict} = setupWithClock(settings);
             jasmine.clock().tick(4000);
             expect(callback).not.toHaveBeenCalled();
             // reset the time
@@ -222,8 +221,8 @@ describe('Inactivity logout -', () => {
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(5000);
             expect(callback).toHaveBeenCalled();
-            cleanupWithClock(IL)
-        })
+            cleanupWithClock(ict)
+        });
     })
 });
 
