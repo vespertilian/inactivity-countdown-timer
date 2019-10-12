@@ -12,12 +12,6 @@ describe('Inactivity countdown timer', () => {
         return {ict};
     }
 
-    function setupWithClock(params: IInactivityConfig, deps?: IInactivityDependencies): {ict: InactivityCountdownTimer} {
-        jasmine.clock().install();
-        jasmine.clock().mockDate();
-        return setup(params, deps)
-    }
-
     function setupAndStart(params?: IInactivityConfig, deps?: IInactivityDependencies): {ict: InactivityCountdownTimer} {
         const {ict} = setup(params, deps);
         ict.start();
@@ -239,6 +233,38 @@ describe('Inactivity countdown timer', () => {
             expect(callback).toHaveBeenCalled();
             cleanupWithClock(ict)
         });
+
+        it('logs a message when local storage is not available', () => {
+            spyOn(console, 'log');
+            // see this issue for storage.prototype https://github.com/jasmine/jasmine/issues/299;
+            spyOn(Storage.prototype, 'setItem').and.throwError('some error');
+            const {ict} = setup({});
+            const expectedMessage = 'LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS';
+            expect(console.log).toHaveBeenCalledWith(expectedMessage, jasmine.any(Error));
+            ict.cleanup();
+        });
+
+        it('works even without local storage', () => {
+            const countDownCallback = jasmine.createSpy('countDownCallback');
+            const countDownCancelledCallback = jasmine.createSpy('countDownCancelledCallback');
+            const settings: IInactivityConfig = {
+                idleTimeoutTime: 20000,
+                startCountDownTimerAt: 10000,
+                countDownCallback: countDownCallback,
+                countDownCancelledCallback: countDownCancelledCallback
+            };
+            const {ict} = setupAndStartWithClock(settings, {localStorage: null});
+            jasmine.clock().tick(9000);
+            expect(countDownCallback).not.toHaveBeenCalled();
+            jasmine.clock().tick(1000);
+            expect(countDownCallback).toHaveBeenCalledWith(10);
+            jasmine.clock().tick(1000);
+            expect(countDownCallback).toHaveBeenCalledWith(9);
+            dispatchMouseEvent('click'); // timer will reset and initialise at 20000
+            jasmine.clock().tick(2000);
+            expect(countDownCancelledCallback).toHaveBeenCalled();
+            cleanupWithClock(ict);
+        })
     })
 });
 

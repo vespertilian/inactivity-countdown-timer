@@ -16,10 +16,10 @@ export interface ILogger {
 }
 
 export interface IInactivityDependencies {
-    logger: ILogger;
-    localStorage: Storage | null;
-    window: Window;
-    document: Document;
+    logger?: ILogger;
+    localStorage?: Storage | null;
+    window?: Window;
+    document?: Document;
 }
 
 const defaultInactivityConfig: IInactivityConfig = {
@@ -46,7 +46,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
     private countDownCancelledCallback: () => void;
 
     // Internal vars
-    readonly localStorage: Storage;
+    readonly localStorage: Storage | null;
     private timeoutTime: number;
     private lastResetTimeStamp: number;
     private countingDown: boolean = false;
@@ -74,7 +74,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
         this.logger = deps && deps.logger || console;
         this.window = deps && deps.window || window;
         this.document = deps && deps.document || document;
-        this.localStorage = deps && deps.localStorage || this.detectAndAssignLocalStorage();
+        this.localStorage = this.detectAndAssignLocalStorage(deps && deps.localStorage);
         if (params) { this.setup(params) }
     }
     /**
@@ -232,23 +232,21 @@ export class InactivityCountdownTimer implements EventListenerObject {
                 return lsLastResetTimeStamp;
             }
         }
-
         return this.lastResetTimeStamp
     }
 
     private setLastResetTimeStamp(timestamp: number): void {
         if(this.localStorage){
-            try{
-                this.localStorage.setItem(this.localStorageKey, timestamp.toString());
-            } catch (error){
-                this.logger.log('Error setting last reset timestamp', error)
-            }
-        } else {
-            this.lastResetTimeStamp = timestamp;
+            this.localStorage.setItem(this.localStorageKey, timestamp.toString());
         }
+        this.lastResetTimeStamp = timestamp;
     }
 
-    private detectAndAssignLocalStorage(): Storage {
+    private detectAndAssignLocalStorage(_localStorage?: Storage | null): Storage {
+        if (localStorageOrNull(_localStorage)) {
+            return _localStorage;
+        }
+
         let uid: string = (new Date()).getTime().toString() + 'detectAndAssignLocalStorage';
         let storage: Storage = localStorage;
         let result: boolean;
@@ -259,7 +257,14 @@ export class InactivityCountdownTimer implements EventListenerObject {
             return result && storage;
         } catch(exception) {
             this.logger.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
+            return null;
         }
     }
 }
 
+function localStorageOrNull(value: Storage | null): boolean {
+    if (value === null)  {
+        return true;
+    }
+    return Boolean(value);
+}

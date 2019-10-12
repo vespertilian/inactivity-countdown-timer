@@ -28,5 +28,7 @@ module.exports = function (wallaby) {
         setup: function () {
             window.__moduleBundler.loadTests();
         }
+        // workers: { initial: 1, regular: 1 },
+        // debug: true
     };
 };
