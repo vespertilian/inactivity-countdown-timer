@@ -1,17 +1,33 @@
-import {InactivityCountdownTimer, IInactivityConfig} from "../src/inactivity-countdown-timer";
+import {
+    InactivityCountdownTimer,
+    IInactivityConfig,
+    IInactivityDependencies
+} from "../src/inactivity-countdown-timer";
 import 'core-js/features/object/assign';
 
 describe('Inactivity countdown timer', () => {
-    function setupAndStart(params?: IInactivityConfig): {ict: InactivityCountdownTimer} {
-        const ict = new InactivityCountdownTimer();
-        ict.setup(params).start();
-        return {ict}
+    function setup(params?: IInactivityConfig, deps?: IInactivityDependencies): {ict: InactivityCountdownTimer} {
+        const ict = new InactivityCountdownTimer({}, deps);
+        ict.setup(params);
+        return {ict};
     }
 
-    function setupWithClock(params: IInactivityConfig): {ict: InactivityCountdownTimer} {
+    function setupWithClock(params: IInactivityConfig, deps?: IInactivityDependencies): {ict: InactivityCountdownTimer} {
         jasmine.clock().install();
         jasmine.clock().mockDate();
-        return setupAndStart(params);
+        return setup(params, deps)
+    }
+
+    function setupAndStart(params?: IInactivityConfig, deps?: IInactivityDependencies): {ict: InactivityCountdownTimer} {
+        const {ict} = setup(params, deps);
+        ict.start();
+        return {ict};
+    }
+
+    function setupAndStartWithClock(params: IInactivityConfig, deps?: IInactivityDependencies): {ict: InactivityCountdownTimer} {
+        jasmine.clock().install();
+        jasmine.clock().mockDate();
+        return setupAndStart(params, deps);
     }
 
     function cleanupWithClock(ict: InactivityCountdownTimer): void {
@@ -91,7 +107,7 @@ describe('Inactivity countdown timer', () => {
     describe('timing out -', () => {
         it('calls the params.timeoutCallback if one was passed in', () => {
             const callback = jasmine.createSpy('callback');
-            const {ict} = setupWithClock({idleTimeoutTime: 2000, timeoutCallback: callback});
+            const {ict} = setupAndStartWithClock({idleTimeoutTime: 2000, timeoutCallback: callback});
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(2001);
             expect(callback).toHaveBeenCalled();
@@ -99,7 +115,7 @@ describe('Inactivity countdown timer', () => {
         });
 
         it('cleanups event listeners the idleTimeout is finished', () => {
-            const {ict} = setupWithClock({idleTimeoutTime: 2000});
+            const {ict} = setupAndStartWithClock({idleTimeoutTime: 2000});
             // we need to call through so the interval timer stops watching
             const cleanup = spyOn(ict, 'cleanup').and.callThrough();
             expect(cleanup).not.toHaveBeenCalled();
@@ -110,7 +126,7 @@ describe('Inactivity countdown timer', () => {
 
         it(`resets the timeout time if one of the event handlers get's called`, () => {
             ['click', 'mousemove', 'keypress'].forEach(() => {
-                const {ict} = setupWithClock({idleTimeoutTime: 2000});
+                const {ict} = setupAndStartWithClock({idleTimeoutTime: 2000});
                 // we need to call through so the interval timer stops watching
                 const timeout = spyOn(ict, 'timeout' as any).and.callThrough();
                 jasmine.clock().tick(1001); // 1001 total time
@@ -133,7 +149,7 @@ describe('Inactivity countdown timer', () => {
                 startCountDownTimerAt: 10000,
                 countDownCallback: callback
             };
-            const {ict} = setupWithClock(settings);
+            const {ict} = setupAndStartWithClock(settings);
             jasmine.clock().tick(9000);
             expect(callback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
@@ -157,7 +173,7 @@ describe('Inactivity countdown timer', () => {
                 countDownCallback: countDownCallback,
                 countDownCancelledCallback: countDownCancelledCallback
             };
-            const {ict} = setupWithClock(settings);
+            const {ict} = setupAndStartWithClock(settings);
             jasmine.clock().tick(9000);
             expect(countDownCallback).not.toHaveBeenCalled();
             jasmine.clock().tick(1000);
@@ -179,7 +195,7 @@ describe('Inactivity countdown timer', () => {
                 startCountDownTimerAt: 1000 * 30, // 30 seconds
                 countDownCallback: countDownCallback
             };
-            const {ict} = setupWithClock(settings);
+            const {ict} = setupAndStartWithClock(settings);
             const fourMins = 1000 * 60 * 4;
             const twentyNineSeconds = 1000 * 29;
             // should call countdown callback only once at 4:30
@@ -211,7 +227,7 @@ describe('Inactivity countdown timer', () => {
                 timeoutCallback: callback,
                 localStorageKey: localStorageKey
             };
-            const {ict} = setupWithClock(settings);
+            const {ict} = setupAndStartWithClock(settings);
             jasmine.clock().tick(4000);
             expect(callback).not.toHaveBeenCalled();
             // reset the time

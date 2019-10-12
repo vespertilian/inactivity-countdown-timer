@@ -11,6 +11,17 @@ export interface IInactivityConfig extends IRegisterCallBacks {
     localStorageKey?: string;
 }
 
+export interface ILogger {
+    log(message?: any, ...optionalParams: any[]): void;
+}
+
+export interface IInactivityDependencies {
+    logger: ILogger;
+    localStorage: Storage | null;
+    window: Window;
+    document: Document;
+}
+
 const defaultInactivityConfig: IInactivityConfig = {
     idleTimeoutTime: 10000,
     localStorageKey: 'inactivity_logout_local_storage',
@@ -35,7 +46,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
     private countDownCancelledCallback: () => void;
 
     // Internal vars
-    private localStorage: Storage;
+    readonly localStorage: Storage;
     private timeoutTime: number;
     private lastResetTimeStamp: number;
     private countingDown: boolean = false;
@@ -51,7 +62,19 @@ export class InactivityCountdownTimer implements EventListenerObject {
         return this.status === InactivityCountdownTimerStatus.stopped
     }
 
-    constructor(params?: IInactivityConfig) {
+    // dom
+    private logger: ILogger | null;
+    private window: Window;
+    private document: Document;
+
+    constructor(
+      private params?: IInactivityConfig,
+      private deps?: IInactivityDependencies,
+    ) {
+        this.logger = deps && deps.logger || console;
+        this.window = deps && deps.window || window;
+        this.document = deps && deps.document || document;
+        this.localStorage = deps && deps.localStorage || this.detectAndAssignLocalStorage();
         if (params) { this.setup(params) }
     }
     /**
@@ -66,7 +89,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
         if((params && typeof(params.startCountDownTimerAt)) === 'number'){
             // if start count down timer is present make sure its a number and less than idleTimeoutTime
             if(params.startCountDownTimerAt > this.idleTimeoutTime) {
-                console.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
+                this.logger.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
                 this.startCountDownTimerAt = this.idleTimeoutTime;
                 this.timeoutTime = 1000; // start the countdown
             } else {
@@ -79,19 +102,16 @@ export class InactivityCountdownTimer implements EventListenerObject {
             this.timeoutTime = this.idleTimeoutTime;
         }
 
-        // setup local storage
-        this.localStorage = this.detectAndAssignLocalStorage();
-
         // attach events that will rest the timers
         // this ends up calling the this.handleEvent function
         // see README.md for more on why we are passing 'this'
         for(let i=0; i < this.resetEvents.length; i++) {
-            document.addEventListener(this.resetEvents[i], this, false)
+            this.document.addEventListener(this.resetEvents[i], this, false)
         }
-        window.addEventListener('load', this, false); // start count down when window is loaded
+        this.window.addEventListener('load', this, false); // start count down when window is loaded
         // this fixes a bug in ie11 where the local storage does not sync
         // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
-        window.addEventListener('storage', function() {}); // effectively a no-op
+        this.window.addEventListener('storage', function() {}); // effectively a no-op
 
         const start = () => this.start();
         return {start};
@@ -121,7 +141,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
      * Clears the timer
      */
     stop(): void {
-        window.clearInterval(this.idleTimeoutID);
+        this.window.clearInterval(this.idleTimeoutID);
         this.status = InactivityCountdownTimerStatus.stopped;
     }
 
@@ -133,17 +153,17 @@ export class InactivityCountdownTimer implements EventListenerObject {
     cleanup(): void {
         if (this.resetEvents.length) {
             for(let i=0; i < this.resetEvents.length; i++) {
-                document.removeEventListener(this.resetEvents[i], this, false)
+                this.document.removeEventListener(this.resetEvents[i], this, false)
             }
-            window.removeEventListener('load', this, false);
-            window.removeEventListener('storage', function() {});
+            this.window.removeEventListener('load', this, false);
+            this.window.removeEventListener('storage', function() {});
             this.stop();
         }
     }
 
     private startPrivate(precision: number) {
         this.currentTimerPrecision = precision;
-        this.idleTimeoutID = window.setInterval(() => {
+        this.idleTimeoutID = this.window.setInterval(() => {
             this.checkIdleTime();
         }, precision);
     }
@@ -205,19 +225,15 @@ export class InactivityCountdownTimer implements EventListenerObject {
     }
 
     private getLastResetTimeStamp(): number {
-        let lastResetTimeStamp: number;
         if(this.localStorage){
-            let lastResetTimeStampString: string;
-            try {
-                lastResetTimeStampString = this.localStorage.getItem(this.localStorageKey);
-                lastResetTimeStamp = parseInt(lastResetTimeStampString, 10)
-            } catch(error) {
-                console.log('Error getting last reset timestamp', error)
+            const lastResetTimeStampString = this.localStorage.getItem(this.localStorageKey);
+            const lsLastResetTimeStamp = parseInt(lastResetTimeStampString, 10);
+            if (lsLastResetTimeStamp) {
+                return lsLastResetTimeStamp;
             }
-        } else {
-            lastResetTimeStamp = this.lastResetTimeStamp;
         }
-        return lastResetTimeStamp;
+
+        return this.lastResetTimeStamp
     }
 
     private setLastResetTimeStamp(timestamp: number): void {
@@ -225,7 +241,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
             try{
                 this.localStorage.setItem(this.localStorageKey, timestamp.toString());
             } catch (error){
-                console.log('Error setting last reset timestamp', error)
+                this.logger.log('Error setting last reset timestamp', error)
             }
         } else {
             this.lastResetTimeStamp = timestamp;
@@ -242,7 +258,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
             storage.removeItem(uid);
             return result && storage;
         } catch(exception) {
-            console.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
+            this.logger.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
         }
     }
 }
