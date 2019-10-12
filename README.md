@@ -85,6 +85,12 @@ The project is setup with both main.ts used for exporting the library and a demo
 6. Push the tags up to github: `git push origin --tags`
 7. Publish `npm publish`
 
+### Big Thanks
+
+Cross-browser Testing Platform and Open Source <3 Provided by [Sauce Labs][homepage]
+
+[homepage]: https://saucelabs.com
+
 ## Benefex
 
 This module was originally published with support from Benefex. [Benefex](http://www.benefex.co.uk/) 
