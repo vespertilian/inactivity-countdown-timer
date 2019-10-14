@@ -5,10 +5,11 @@ export interface IRegisterCallBacks {
 }
 
 export interface IInactivityConfig extends IRegisterCallBacks {
-    idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
-    resetEvents?: string[];
+    idleTimeoutTime?: number;
     localStorageKey?: string;
+    resetEvents?: string[];
+    windowResetEvents?: string[];
 }
 
 export interface ILogger {
@@ -25,7 +26,8 @@ export interface IInactivityDependencies {
 const defaultInactivityConfig: IInactivityConfig = {
     idleTimeoutTime: 10000,
     localStorageKey: 'inactivity_logout_local_storage',
-    resetEvents: ['click','mousemove','keypress']
+    resetEvents: ['click','mousemove','keypress'],
+    windowResetEvents: ['load']
 };
 
 export enum InactivityCountdownTimerStatus {
@@ -39,6 +41,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
     private startCountDownTimerAt: number;
     private localStorageKey: string;
     private resetEvents: string[] = [];
+    private windowResetEvents: string[] = [];
 
     // IRegisterCallbacks
     private timeoutCallback: () => void;
@@ -101,17 +104,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
             this.startCountDownTimerAt = 0;
             this.timeoutTime = this.idleTimeoutTime;
         }
-
-        // attach events that will rest the timers
-        // this ends up calling the this.handleEvent function
-        // see README.md for more on why we are passing 'this'
-        for(let i=0; i < this.resetEvents.length; i++) {
-            this.document.addEventListener(this.resetEvents[i], this, false)
-        }
-        this.window.addEventListener('load', this, false); // start count down when window is loaded
-        // this fixes a bug in ie11 where the local storage does not sync
-        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
-        this.window.addEventListener('storage', function() {}); // effectively a no-op
+        this.attacheEventListeners();
 
         const start = () => this.start();
         return {start};
@@ -151,13 +144,32 @@ export class InactivityCountdownTimer implements EventListenerObject {
      * it will not be garbage collected if you just delete it.
      */
     cleanup(): void {
-        if (this.resetEvents.length) {
-            for(let i=0; i < this.resetEvents.length; i++) {
-                this.document.removeEventListener(this.resetEvents[i], this, false)
-            }
-            this.window.removeEventListener('load', this, false);
-            this.window.removeEventListener('storage', function() {});
-            this.stop();
+        this.removeEventListeners();
+
+        // added in detectAndAssignLocalStorage for ie11
+        this.window.removeEventListener('storage', function() {});
+        this.stop();
+    }
+
+    private attacheEventListeners() {
+        // attach events that will rest the timers
+        // this ends up calling the this.handleEvent function
+        // see README.md for more on why we are passing 'this'
+        for(let i=0; i < this.resetEvents.length; i++) {
+            this.document.addEventListener(this.resetEvents[i], this, false)
+        }
+
+        for(let i=0; i < this.windowResetEvents.length; i++) {
+            this.window.addEventListener(this.windowResetEvents[i], this, false);
+        }
+    }
+
+    private removeEventListeners() {
+        for(let i=0; i < this.resetEvents.length; i++) {
+            this.document.removeEventListener(this.resetEvents[i], this, false)
+        }
+        for(let i=0; i < this.windowResetEvents.length; i++) {
+            this.window.removeEventListener(this.windowResetEvents[i], this, false);
         }
     }
 
@@ -246,6 +258,10 @@ export class InactivityCountdownTimer implements EventListenerObject {
         if (localStorageOrNull(_localStorage)) {
             return _localStorage;
         }
+
+        // this fixes a bug in ie11 where the local storage does not sync
+        // https://connect.microsoft.com/IE/feedback/details/812563/ie-11-local-storage-synchronization-issues
+        this.window.addEventListener('storage', function() {}); // effectively a no-op
 
         let uid: string = (new Date()).getTime().toString() + 'detectAndAssignLocalStorage';
         let storage: Storage = localStorage;

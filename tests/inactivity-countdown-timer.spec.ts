@@ -31,14 +31,14 @@ describe('Inactivity countdown timer', () => {
     }
 
     describe('construction', () => {
-        it('Logs to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
+        it('logs to the console when the idleTimeoutTime is smaller than the startCountdownTimerAt value', () => {
             const log = spyOn(window.console, 'log');
             const {ict} = setupAndStart({startCountDownTimerAt: 20000, idleTimeoutTime: 10000});
             ict.cleanup();
             expect(log).toHaveBeenCalledWith('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime')
         });
 
-        it('Attaches event handlers to document.click, document.mousemove, document.keypress, window.load when none are passed in', () => {
+        it('attaches event handlers to document.click, document.mousemove, document.keypress, window.load when none are passed in', () => {
             const documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             const windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
             const {ict} = setupAndStart();
@@ -52,11 +52,11 @@ describe('Inactivity countdown timer', () => {
         it('Attaches custom event handlers to document and window when they are passed in', () => {
             const documentAttachEventSpy = spyOn(document, 'addEventListener').and.callThrough();
             const windowAttachEventSpy = spyOn(window, 'addEventListener').and.callThrough();
-            const {ict} = setupAndStart({resetEvents: ['scroll','dblclick']});
+            const {ict} = setupAndStart({resetEvents: ['scroll','dblclick'], windowResetEvents: ['blur']});
             ['scroll', 'dblclick'].forEach((event) => {
                 expect(documentAttachEventSpy).toHaveBeenCalledWith(event, ict as any, false);
             });
-            expect(windowAttachEventSpy).toHaveBeenCalledWith('load', ict as any, false);
+            expect(windowAttachEventSpy).toHaveBeenCalledWith('blur', ict as any, false);
             ict.cleanup();
         });
     });
@@ -89,12 +89,15 @@ describe('Inactivity countdown timer', () => {
         it('removes event listeners when .cleanup is called', () => {
             const documentRemoveEventSpy = spyOn(document, 'removeEventListener').and.callThrough();
             const windowRemoveEventSpy = spyOn(window, 'removeEventListener').and.callThrough();
-            const {ict} = setupAndStart({resetEvents: ['click', 'mousemove']});
+            const {ict} = setupAndStart({resetEvents: ['click', 'mousemove'],  windowResetEvents: ['blur', 'load']});
             ict.cleanup();
             ['click', 'mousemove'].forEach((event) => {
                 expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, ict as any, false);
             });
-            expect(windowRemoveEventSpy).toHaveBeenCalledWith('load', ict as any, false);
+
+            ['blur', 'load'].forEach((event) => {
+                expect(windowRemoveEventSpy).toHaveBeenCalledWith(event, ict as any, false);
+            });
         })
     });
 

@@ -16,7 +16,8 @@ Useful when a user forgets to close their browser or tab before walking away fro
 const settings = {
     idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
-    resetEvents?: string[];
+    resetEvents?: string[]; // document events
+    windowResetEvents?: string[];
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
@@ -44,11 +45,15 @@ run `npm start` to view the demo locally
  - Written in typescript and bundled as a UMD module.
  - Tests with a saucelabs setup for cross browser testing.
 
-By default the inactivity timeout is reset by these events: 
+By default the inactivity timeout is reset by these document events: 
 
 - clicks
 - mousemovement
 - keypresses
+
+and this window event 
+
+- load
 
 ## Supports
 
