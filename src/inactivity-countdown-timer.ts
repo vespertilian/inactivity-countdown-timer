@@ -10,6 +10,7 @@ export interface IInactivityConfig extends IRegisterCallBacks {
     localStorageKey?: string;
     resetEvents?: string[];
     windowResetEvents?: string[];
+    throttleDuration?: number;
 }
 
 export interface ILogger {
@@ -27,7 +28,8 @@ const defaultInactivityConfig: IInactivityConfig = {
     idleTimeoutTime: 10000,
     localStorageKey: 'inactivity_logout_local_storage',
     resetEvents: ['click','mousemove','keypress'],
-    windowResetEvents: ['load']
+    windowResetEvents: ['load'],
+    throttleDuration: 0
 };
 
 export enum InactivityCountdownTimerStatus {
@@ -50,11 +52,13 @@ export class InactivityCountdownTimer implements EventListenerObject {
 
     // Internal vars
     readonly localStorage: Storage | null;
-    private timeoutTime: number;
+    private internalTimeoutTime: number;
     private lastResetTimeStamp: number;
     private countingDown: boolean = false;
-    private idleTimeoutID: number;
+    private idleIntervalId: number;
     private currentTimerPrecision: number;
+    private throttleDuration: number;
+    private throttleTimeoutId: number;
 
     // status public
     status: InactivityCountdownTimerStatus = InactivityCountdownTimerStatus.stopped;
@@ -89,21 +93,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
         this.cleanup();
         Object.assign(this, defaultInactivityConfig, params);
 
-        if((params && typeof(params.startCountDownTimerAt)) === 'number'){
-            // if start count down timer is present make sure its a number and less than idleTimeoutTime
-            if(params.startCountDownTimerAt > this.idleTimeoutTime) {
-                this.logger.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
-                this.startCountDownTimerAt = this.idleTimeoutTime;
-                this.timeoutTime = 1000; // start the countdown
-            } else {
-                this.startCountDownTimerAt = params.startCountDownTimerAt;
-                this.timeoutTime = this.idleTimeoutTime - this.startCountDownTimerAt;
-            }
-        } else {
-            // don't use count down timer
-            this.startCountDownTimerAt = 0;
-            this.timeoutTime = this.idleTimeoutTime;
-        }
+        this.ensureReasonableTimings(params);
         this.attacheEventListeners();
 
         const start = () => this.start();
@@ -119,6 +109,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
         // as we want all events to fire the same actions
         let currentTime = (new Date).getTime();
         this.setLastResetTimeStamp(currentTime);
+        this.throttle();
     }
 
     /**
@@ -126,7 +117,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
      */
     start(): void {
         this.setLastResetTimeStamp((new Date()).getTime());
-        this.startPrivate(this.timeoutTime);
+        this.startPrivate(this.internalTimeoutTime);
         this.status = InactivityCountdownTimerStatus.started;
     }
 
@@ -134,7 +125,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
      * Clears the timer
      */
     stop(): void {
-        this.window.clearInterval(this.idleTimeoutID);
+        this.window.clearInterval(this.idleIntervalId);
         this.status = InactivityCountdownTimerStatus.stopped;
     }
 
@@ -144,11 +135,48 @@ export class InactivityCountdownTimer implements EventListenerObject {
      * it will not be garbage collected if you just delete it.
      */
     cleanup(): void {
-        this.removeEventListeners();
+        this.detachEventListeners();
 
         // added in detectAndAssignLocalStorage for ie11
         this.window.removeEventListener('storage', function() {});
+        this.window.clearTimeout(this.throttleTimeoutId);
         this.stop();
+    }
+
+    private ensureReasonableTimings(params?: IInactivityConfig) {
+        if((params && typeof(params.startCountDownTimerAt)) === 'number') {
+            // if start count down timer is present make sure its a number and less than idleTimeoutTime
+            if(params.startCountDownTimerAt > this.idleTimeoutTime) {
+                this.logger.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
+                this.startCountDownTimerAt = this.idleTimeoutTime;
+                this.internalTimeoutTime = 1000; // start the countdown
+            } else {
+                this.startCountDownTimerAt = params.startCountDownTimerAt;
+                this.internalTimeoutTime = this.idleTimeoutTime - this.startCountDownTimerAt;
+            }
+        } else {
+            // don't use count down timer
+            this.startCountDownTimerAt = 0;
+            this.internalTimeoutTime = this.idleTimeoutTime;
+        }
+
+        if ((params && typeof(params.throttleDuration)) === 'number') {
+            const maxThrottleTime = Math.floor(this.internalTimeoutTime / 5);
+            params.throttleDuration;
+            if (params.throttleDuration > maxThrottleTime) {
+                this.logger.log(`throttle time must be smaller than 1/5th timeout time: ${this.internalTimeoutTime} setting to ${maxThrottleTime}ms`)
+                this.throttleDuration = maxThrottleTime;
+            }
+        }
+    }
+
+    private throttle() {
+       if (this.throttleDuration > 0 ) {
+           this.detachEventListeners();
+           this.throttleTimeoutId = this.window.setTimeout(() => {
+               this.attacheEventListeners();
+           }, this.throttleDuration);
+       }
     }
 
     private attacheEventListeners() {
@@ -164,7 +192,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
         }
     }
 
-    private removeEventListeners() {
+    private detachEventListeners() {
         for(let i=0; i < this.resetEvents.length; i++) {
             this.document.removeEventListener(this.resetEvents[i], this, false)
         }
@@ -175,7 +203,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
 
     private startPrivate(precision: number) {
         this.currentTimerPrecision = precision;
-        this.idleTimeoutID = this.window.setInterval(() => {
+        this.idleIntervalId = this.window.setInterval(() => {
             this.checkIdleTime();
         }, precision);
     }
@@ -272,7 +300,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
             storage.removeItem(uid);
             return result && storage;
         } catch(exception) {
-            this.logger.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception)
+            this.logger.log('LOCAL STORAGE IS NOT AVAILABLE FOR SYNCING TIMEOUT ACROSS TABS', exception);
             return null;
         }
     }

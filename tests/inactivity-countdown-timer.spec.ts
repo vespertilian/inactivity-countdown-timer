@@ -4,6 +4,7 @@ import {
     IInactivityDependencies
 } from "../src/inactivity-countdown-timer";
 import 'core-js/features/object/assign';
+export type Spied<T> = { [Method in keyof T]: jasmine.Spy };
 
 describe('Inactivity countdown timer', () => {
     function setup(params?: IInactivityConfig, deps?: IInactivityDependencies): {ict: InactivityCountdownTimer} {
@@ -86,10 +87,20 @@ describe('Inactivity countdown timer', () => {
     });
 
     describe('cleanup removing event listeners -', () => {
-        it('removes event listeners when .cleanup is called', () => {
+        it('removes event listeners and clears timers when .cleanup is called', () => {
             const documentRemoveEventSpy = spyOn(document, 'removeEventListener').and.callThrough();
             const windowRemoveEventSpy = spyOn(window, 'removeEventListener').and.callThrough();
-            const {ict} = setupAndStart({resetEvents: ['click', 'mousemove'],  windowResetEvents: ['blur', 'load']});
+            const clearInterval = spyOn(window, 'clearInterval').and.callThrough();
+            const clearTimeout = spyOn(window, 'clearTimeout').and.callThrough();
+
+            const {ict} = setupAndStart({
+                resetEvents: ['click', 'mousemove'],
+                windowResetEvents: ['blur', 'load'],
+                throttleDuration: 1000
+            });
+
+            ict.handleEvent('click' as any);
+
             ict.cleanup();
             ['click', 'mousemove'].forEach((event) => {
                 expect(documentRemoveEventSpy).toHaveBeenCalledWith(event, ict as any, false);
@@ -98,6 +109,9 @@ describe('Inactivity countdown timer', () => {
             ['blur', 'load'].forEach((event) => {
                 expect(windowRemoveEventSpy).toHaveBeenCalledWith(event, ict as any, false);
             });
+
+            expect(clearTimeout).toHaveBeenCalledWith(ict['throttleTimeoutId']);
+            expect(clearInterval).toHaveBeenCalledWith(ict['idleIntervalId']);
         })
     });
 
@@ -213,6 +227,62 @@ describe('Inactivity countdown timer', () => {
             expect(countDownCallback).toHaveBeenCalledTimes(4);
             cleanupWithClock(ict);
         });
+    });
+
+    describe('throttle', () => {
+        it('throttles the handle event function when a throttle value is passed in', () => {
+            const settings: IInactivityConfig = {
+                idleTimeoutTime: 1000 * 60 * 5, // 5 minutes
+                startCountDownTimerAt: 1000 * 30, // 30 seconds
+                throttleDuration: 1000 * 30, // 30 seconds
+            };
+            const {ict} = setupAndStartWithClock(settings);
+            const handleEventSpy = spyOn(ict, 'handleEvent').and.callThrough();
+
+            jasmine.clock().tick(15000); // 15 seconds
+            dispatchMouseEvent('click'); // event will trigger handleEvent and reset the timer
+            expect(handleEventSpy).toHaveBeenCalledTimes(1);
+
+            jasmine.clock().tick(29000); // 29 seconds after click handleEvent will not be triggered as it is throttled
+            dispatchMouseEvent('click'); // nothing!
+            expect(handleEventSpy).not.toHaveBeenCalledTimes(2);
+
+            jasmine.clock().tick(1000); // 30 seconds clock will
+            dispatchMouseEvent('click'); // timer will reset and initialise
+            expect(handleEventSpy).toHaveBeenCalledTimes(2);
+
+            jasmine.clock().tick(31000); // 31 more seconds clock will reset again;
+            dispatchMouseEvent('click'); // timer will reset and initialise
+            expect(handleEventSpy).toHaveBeenCalledTimes(3);
+            cleanupWithClock(ict);
+        });
+
+        it('ignores a throttle duration large than 1/5th the timeout time', () => {
+            const log = spyOn(window.console, 'log');
+
+            const settings: IInactivityConfig = {
+                idleTimeoutTime: 1000 * 60 * 5, // 5 minutes
+                startCountDownTimerAt: 1000 * 30, // 30 seconds
+                throttleDuration: 1000 * 60, // 30 seconds
+            };
+            const {ict} = setupAndStartWithClock(settings);
+            const handleEventSpy = spyOn(ict, 'handleEvent').and.callThrough();
+
+            expect(log).toHaveBeenCalledWith('throttle time must be smaller than 1/5th timeout time: 270000 setting to 54000ms');
+            jasmine.clock().tick(1000);
+            dispatchMouseEvent('click'); // event will trigger handleEvent and reset the timer
+            expect(handleEventSpy).toHaveBeenCalledTimes(1);
+
+            jasmine.clock().tick(53000); // 53 seconds after click handleEvent will not be triggered as it is throttled
+            dispatchMouseEvent('click'); // nothing!
+            expect(handleEventSpy).not.toHaveBeenCalledTimes(2);
+
+            jasmine.clock().tick(1000); // 54 seconds after click handleEvent will not be triggered as it is throttled
+            dispatchMouseEvent('click');
+            expect(handleEventSpy).toHaveBeenCalledTimes(2);
+
+            cleanupWithClock(ict);
+        })
     });
 
     describe('localstorage - ', () => {

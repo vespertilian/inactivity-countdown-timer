@@ -42,8 +42,11 @@ run `npm start` to view the demo locally
  - Activity is **synced across tabs using local storage** (users won't be transitioned if they are active in any other tab).
  - **Dynamically adjusting timer**. Which will set itself to initially timeout when the count down starts, then change to timeout every second for the countdown. 
  - Configure what events reset your timer and count as an 'Activity' by passing in you're own reset event list.
+ - Throttle the event listeners (so listeners like mouse move are not constantly firing) - will affect precise timing 
  - Written in typescript and bundled as a UMD module.
  - Tests with a saucelabs setup for cross browser testing.
+
+### Events
 
 By default the inactivity timeout is reset by these document events: 
 
@@ -55,9 +58,21 @@ and this window event
 
 - load
 
+
+### Throttle
+
+When you enable the throttle option by passing a throttle config value greater than zero, event listeners are disabled for the period specified after any event listener is fired from any configured event.  
+
+If you have a 5 minute idle timeout time, and a 15 second throttle, you have an effective idle timeout range of 4 minutes and 45 seconds as you may miss the first 15 seconds of activity whenever the timer is reset.
+
+To prevent poor config you cannot set a throttle time > 1/5 the internal timeout time. 
+Internal timeout time is calculated as idleTimeoutTime - startCountdownTimer.
+
+So a 5 minute timeout with a 30 second countdown timer you have a 4 minute and 30 second internal timeout time, meaning the greatest throttle you can have is 1/5 of 4 min 30 seconds 54 seconds ... 10 to 30 seconds is probably a good number anyway :) 
+
 ## Supports
 
- - IE9 with core-js (import 'core-js/features/object/assign';)
+ - IE9 with core-js (import 'core-js/features/object/assign' ;)
  - IE10+
  - Chrome
  - Firefox

@@ -4,33 +4,52 @@ export interface IRegisterCallBacks {
     countDownCancelledCallback?(): void;
 }
 export interface IInactivityConfig extends IRegisterCallBacks {
-    idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
-    resetEvents?: string[];
+    idleTimeoutTime?: number;
     localStorageKey?: string;
+    resetEvents?: string[];
+    windowResetEvents?: string[];
+    throttleDuration?: number;
+}
+export interface ILogger {
+    log(message?: any, ...optionalParams: any[]): void;
+}
+export interface IInactivityDependencies {
+    logger?: ILogger;
+    localStorage?: Storage | null;
+    window?: Window;
+    document?: Document;
 }
 export declare enum InactivityCountdownTimerStatus {
     started = "started",
     stopped = "stopped"
 }
 export declare class InactivityCountdownTimer implements EventListenerObject {
+    private params?;
+    private deps?;
     private idleTimeoutTime;
     private startCountDownTimerAt;
     private localStorageKey;
     private resetEvents;
+    private windowResetEvents;
     private timeoutCallback;
     private countDownCallback;
     private countDownCancelledCallback;
-    private localStorage;
-    private timeoutTime;
+    readonly localStorage: Storage | null;
+    private internalTimeoutTime;
     private lastResetTimeStamp;
     private countingDown;
-    private idleTimeoutID;
+    private idleIntervalId;
     private currentTimerPrecision;
+    private throttleDuration;
+    private throttleTimeoutId;
     status: InactivityCountdownTimerStatus;
     readonly started: boolean;
     readonly stopped: boolean;
-    constructor(params?: IInactivityConfig);
+    private logger;
+    private window;
+    private document;
+    constructor(params?: IInactivityConfig, deps?: IInactivityDependencies);
     /**
      * @param params
      * - **idleTimeoutTime**: 10000 - ms / 10 seconds
@@ -57,6 +76,10 @@ export declare class InactivityCountdownTimer implements EventListenerObject {
      * it will not be garbage collected if you just delete it.
      */
     cleanup(): void;
+    private ensureReasonableTimings;
+    private throttle;
+    private attacheEventListeners;
+    private detachEventListeners;
     private startPrivate;
     private resetTimer;
     private timeout;
