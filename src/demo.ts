@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         countDownCallback: countDownCallback,
         countDownCancelledCallback: countDownCancelledCallback
     };
-    new InactivityCountdownTimer(settings)
+
+    new InactivityCountdownTimer(settings).start();
 });
 
