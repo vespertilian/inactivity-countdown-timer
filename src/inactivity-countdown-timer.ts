@@ -144,9 +144,15 @@ export class InactivityCountdownTimer implements EventListenerObject {
     }
 
     private ensureReasonableTimings(params?: IInactivityConfig) {
-        if((params && typeof(params.startCountDownTimerAt)) === 'number') {
+        if(params && notUndefined(params.idleTimeoutTime) && !isNumberNotNan(params.idleTimeoutTime)) {
+            this.logger.log('idleTimeoutTime passed was not a number, setting to 30 minutes');
+            // ideally we never get here, but just in case some type of sensible timeout fallback
+            this.idleTimeoutTime = 30 * 60 * 1000;
+        }
+
+        if(params && isNumberNotNan(params.startCountDownTimerAt)) {
             // if start count down timer is present make sure its a number and less than idleTimeoutTime
-            if(params.startCountDownTimerAt > this.idleTimeoutTime) {
+            if(!(params.startCountDownTimerAt < this.idleTimeoutTime)) {
                 this.logger.log('startCountdown time must be smaller than idleTimeoutTime, setting to idleTimeoutTime');
                 this.startCountDownTimerAt = this.idleTimeoutTime;
                 this.internalTimeoutTime = 1000; // start the countdown
@@ -160,7 +166,7 @@ export class InactivityCountdownTimer implements EventListenerObject {
             this.internalTimeoutTime = this.idleTimeoutTime;
         }
 
-        if ((params && typeof(params.throttleDuration)) === 'number') {
+        if (params && isNumberNotNan(params.throttleDuration)) {
             const maxThrottleTime = Math.floor(this.internalTimeoutTime / 5);
             params.throttleDuration;
             if (params.throttleDuration > maxThrottleTime) {
@@ -311,4 +317,13 @@ function localStorageOrNull(value: Storage | null): boolean {
         return true;
     }
     return Boolean(value);
+}
+
+function notUndefined(value: any) {
+    return value !== undefined;
+}
+
+export function isNumberNotNan(value: any): boolean {
+    //isNaN not Number.isNan for ie9
+    return typeof value === 'number' && !isNaN(value)
 }

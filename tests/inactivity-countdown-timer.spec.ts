@@ -1,7 +1,7 @@
 import {
     InactivityCountdownTimer,
     IInactivityConfig,
-    IInactivityDependencies
+    IInactivityDependencies, isNumberNotNan
 } from "../src/inactivity-countdown-timer";
 import 'core-js/features/object/assign';
 export type Spied<T> = { [Method in keyof T]: jasmine.Spy };
@@ -60,6 +60,24 @@ describe('Inactivity countdown timer', () => {
             expect(windowAttachEventSpy).toHaveBeenCalledWith('blur', ict as any, false);
             ict.cleanup();
         });
+    });
+
+    describe('requires a number for idle timeout time, sets a default if none provided', () => {
+        it('sets a reasonable default if maths fails to pass a number', () => {
+            const params = {
+                idleTimeoutTime: parseInt('aaa', 10),
+            };
+            const deps = {
+                logger: jasmine.createSpyObj(['log'])
+            };
+            const {ict} = setupAndStart(params, deps);
+
+            const thirtyMinutes = 30 * 60 * 1000;
+            expect(ict['idleTimeoutTime']).toEqual(thirtyMinutes);
+            expect(deps.logger.log).toHaveBeenCalledWith('idleTimeoutTime passed was not a number, setting to 30 minutes');
+
+            ict.cleanup();
+        })
     });
 
     describe('start', () => {
@@ -338,7 +356,34 @@ describe('Inactivity countdown timer', () => {
             expect(countDownCancelledCallback).toHaveBeenCalled();
             cleanupWithClock(ict);
         })
-    })
+    });
+
+    describe('isNumberNotNull', () => {
+        it('returns true for a number', () => {
+            const result = isNumberNotNan(10);
+            expect(result).toBe(true);
+            const result2 = isNumberNotNan(0);
+            expect(result2).toBe(true);
+        });
+
+        it('returns false for NaN', () => {
+            // type of NaN is a number :(
+            const result = isNumberNotNan(NaN);
+            expect(result).toBe(false);
+        });
+
+        it('returns false for other values', () => {
+            // type of NaN is a number :(
+            const result = isNumberNotNan({});
+            expect(result).toBe(false);
+
+            const result2 = isNumberNotNan('');
+            expect(result2).toBe(false);
+
+            const result3 = isNumberNotNan(false);
+            expect(result3).toBe(false);
+        })
+    });
 });
 
 // see this link for eventClasses https://developer.mozilla.org/en-US/docs/Web/API/Document/createEvent#Notes
