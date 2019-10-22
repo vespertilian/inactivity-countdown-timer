@@ -17,11 +17,12 @@ const settings = {
     idleTimeoutTime?: number;
     startCountDownTimerAt?: number;
     resetEvents?: string[]; // document events
+    throttleDuration?: number;
+    localStorageKey?: string;
     windowResetEvents?: string[];
     timeoutCallback?(): void;
     countDownCallback?(secondsLeft: number): void;
     countDownCancelledCallback?(): void;
-    localStorageKey?: string;
 }
 
 // Instantiate new logout object
@@ -41,6 +42,7 @@ run `npm start` to view the demo locally
  - A count down callback - **alert users you are going to transition them**. 
  - Activity is **synced across tabs using local storage** (users won't be transitioned if they are active in any other tab).
  - **Dynamically adjusting timer**. Which will set itself to initially timeout when the count down starts, then change to timeout every second for the countdown. 
+ - Will fall back to a 30 minute timeout if you pass an invalid number as the inactivityTimeoutTime (pass a valid number)
  - Configure what events reset your timer and count as an 'Activity' by passing in you're own reset event list.
  - Throttle the event listeners (so listeners like mouse move are not constantly firing) - will affect precise timing 
  - Written in typescript and bundled as a UMD module.

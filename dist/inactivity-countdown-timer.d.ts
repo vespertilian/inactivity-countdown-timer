@@ -90,3 +90,4 @@ export declare class InactivityCountdownTimer implements EventListenerObject {
     private setLastResetTimeStamp;
     private detectAndAssignLocalStorage;
 }
+export declare function isNumberNotNan(value: any): boolean;

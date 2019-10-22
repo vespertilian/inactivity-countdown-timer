@@ -1,6 +1,6 @@
 {
   "name": "inactivity-countdown-timer",
-  "version": "2.0.0-beta-1",
+  "version": "2.0.0-beta-2",
   "description": "A plain JS (Typescript) module that will countdown and timeout when users are inactive/idle.",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
